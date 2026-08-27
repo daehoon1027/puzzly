@@ -38,7 +38,7 @@ const photoSets: Record<string, Photo[]> = {
   ],
 };
 
-const difficulties = [9, 16, 25, 36, 49, 64, 100, 400];
+const difficulties = [12, 20, 30, 48, 80, 120, 200, 400];
 
 function findPhotos(keyword: string) {
   const word = keyword.trim().toLowerCase();
@@ -66,14 +66,38 @@ function shuffled(count: number) {
   return items;
 }
 
+function gridDimensions(count: number) {
+  let bestRows = 1;
+  let bestColumns = count;
+  let bestDifference = Number.POSITIVE_INFINITY;
+  for (let rows = 1; rows <= Math.sqrt(count); rows++) {
+    if (count % rows !== 0) continue;
+    const columns = count / rows;
+    const difference = Math.abs(columns / rows - 4 / 3);
+    if (difference < bestDifference) {
+      bestRows = rows;
+      bestColumns = columns;
+      bestDifference = difference;
+    }
+  }
+  return { rows: bestRows, columns: bestColumns };
+}
+
 function pieceClipPath(piece: number) {
   let seed = (piece + 1) * 9301 + 49297;
   const next = () => {
-    seed = (seed * 233280 + 17) % 100003;
-    return seed / 100003;
+    seed = (seed * 16807) % 2147483647;
+    return seed / 2147483647;
   };
-  const jitter = Array.from({ length: 12 }, () => Math.round(next() * 8) - 4);
-  return `polygon(7% 0%, ${36 + jitter[0]}% 0%, ${50 + jitter[1]}% 9%, ${64 + jitter[2]}% 0%, 93% 0%, 100% 7%, 100% ${36 + jitter[3]}%, 91% ${50 + jitter[4]}%, 100% ${64 + jitter[5]}%, 100% 93%, 93% 100%, ${64 + jitter[6]}% 100%, ${50 + jitter[7]}% 91%, ${36 + jitter[8]}% 100%, 7% 100%, 0% 93%, 0% ${64 + jitter[9]}%, 9% ${50 + jitter[10]}%, 0% ${36 + jitter[11]}%, 0% 7%)`;
+  const vertexCount = 7 + Math.floor(next() * 7);
+  const points = Array.from({ length: vertexCount }, (_, index) => {
+    const angle = (Math.PI * 2 * index) / vertexCount + (next() - 0.5) * 0.28;
+    const radius = 38 + next() * 15;
+    const x = Math.max(2, Math.min(98, 50 + Math.cos(angle) * radius));
+    const y = Math.max(2, Math.min(98, 50 + Math.sin(angle) * radius));
+    return `${x.toFixed(1)}% ${y.toFixed(1)}%`;
+  });
+  return `polygon(${points.join(', ')})`;
 }
 
 export default function Home() {
@@ -81,7 +105,7 @@ export default function Home() {
   const [searched, setSearched] = useState('알프스의 봄');
   const [photos, setPhotos] = useState(photoSets.nature);
   const [selectedPhoto, setSelectedPhoto] = useState(photoSets.nature[0]);
-  const [pieceCount, setPieceCount] = useState(16);
+  const [pieceCount, setPieceCount] = useState(20);
   const [mode, setMode] = useState<PuzzleMode>('classic');
   const [pieces, setPieces] = useState<number[] | null>(null);
   const [picked, setPicked] = useState<number | null>(null);
@@ -92,7 +116,7 @@ export default function Home() {
   const [completed, setCompleted] = useState(false);
   const [showReference, setShowReference] = useState(false);
 
-  const gridSize = Math.sqrt(pieceCount);
+  const { rows: gridRows, columns: gridColumns } = gridDimensions(pieceCount);
   const progress = useMemo(() => {
     if (!pieces) return 0;
     if (mode === 'shape') return Math.round((placed.length / pieces.length) * 100);
@@ -215,11 +239,11 @@ export default function Home() {
 
         {mode === 'classic' ? <div className="game-layout">
           <div className="board-wrap">
-            <div className={`puzzle-board ${completed ? 'complete' : ''}`} style={{ gridTemplateColumns: `repeat(${gridSize}, 1fr)` }}>
+            <div className={`puzzle-board ${completed ? 'complete' : ''}`} style={{ gridTemplateColumns: `repeat(${gridColumns}, 1fr)`, gridTemplateRows: `repeat(${gridRows}, 1fr)` }}>
               {pieces.map((piece, index) => {
-                const row = Math.floor(piece / gridSize);
-                const col = piece % gridSize;
-                return <button key={index} aria-label={`${index + 1}번 자리의 퍼즐 조각`} className={`puzzle-piece ${picked === index ? 'picked' : ''}`} onClick={() => selectPiece(index)} style={{ backgroundImage: `url(${selectedPhoto.url})`, backgroundSize: `${gridSize * 100}% ${gridSize * 100}%`, backgroundPosition: `${gridSize === 1 ? 0 : (col / (gridSize - 1)) * 100}% ${gridSize === 1 ? 0 : (row / (gridSize - 1)) * 100}%` }} />;
+                const row = Math.floor(piece / gridColumns);
+                const col = piece % gridColumns;
+                return <button key={index} aria-label={`${index + 1}번 자리의 퍼즐 조각`} className={`puzzle-piece ${picked === index ? 'picked' : ''}`} onClick={() => selectPiece(index)} style={{ backgroundImage: `url(${selectedPhoto.url})`, backgroundSize: `${gridColumns * 100}% ${gridRows * 100}%`, backgroundPosition: `${gridColumns === 1 ? 0 : (col / (gridColumns - 1)) * 100}% ${gridRows === 1 ? 0 : (row / (gridRows - 1)) * 100}%` }} />;
               })}
             </div>
             {showReference && <div className="reference"><img src={selectedPhoto.url} alt={`원본: ${selectedPhoto.label}`} /><span>원본</span></div>}
@@ -231,10 +255,10 @@ export default function Home() {
           </aside>
         </div> : <div className="shape-game-layout">
           <div className="board-wrap">
-            <div className={`shape-board ${completed ? 'complete' : ''}`} style={{ gridTemplateColumns: `repeat(${gridSize}, 1fr)` }}>
+            <div className={`shape-board ${completed ? 'complete' : ''}`} style={{ gridTemplateColumns: `repeat(${gridColumns}, 1fr)`, gridTemplateRows: `repeat(${gridRows}, 1fr)` }}>
               {pieces.map((_, slot) => {
-                const row = Math.floor(slot / gridSize);
-                const col = slot % gridSize;
+                const row = Math.floor(slot / gridColumns);
+                const col = slot % gridColumns;
                 const isPlaced = placed.includes(slot);
                 return <button
                   key={slot}
@@ -249,8 +273,8 @@ export default function Home() {
                     style={{
                       clipPath: pieceClipPath(slot),
                       backgroundImage: isPlaced ? `url(${selectedPhoto.url})` : undefined,
-                      backgroundSize: `${gridSize * 100}% ${gridSize * 100}%`,
-                      backgroundPosition: `${gridSize === 1 ? 0 : (col / (gridSize - 1)) * 100}% ${gridSize === 1 ? 0 : (row / (gridSize - 1)) * 100}%`,
+                      backgroundSize: `${gridColumns * 100}% ${gridRows * 100}%`,
+                      backgroundPosition: `${gridColumns === 1 ? 0 : (col / (gridColumns - 1)) * 100}% ${gridRows === 1 ? 0 : (row / (gridRows - 1)) * 100}%`,
                     }}
                   />
                 </button>;
@@ -264,8 +288,8 @@ export default function Home() {
             <div className="tray-progress"><i style={{ width: `${progress}%` }}/><span>{progress}%</span></div>
             <div className={`tray-grid tray-${pieceCount}`}>
               {pieces.filter((piece) => !placed.includes(piece)).map((piece) => {
-                const row = Math.floor(piece / gridSize);
-                const col = piece % gridSize;
+                const row = Math.floor(piece / gridColumns);
+                const col = piece % gridColumns;
                 return <button
                   key={piece}
                   draggable
@@ -277,8 +301,9 @@ export default function Home() {
                   style={{
                     clipPath: pieceClipPath(piece),
                     backgroundImage: `url(${selectedPhoto.url})`,
-                    backgroundSize: `${gridSize * 100}% ${gridSize * 100}%`,
-                    backgroundPosition: `${gridSize === 1 ? 0 : (col / (gridSize - 1)) * 100}% ${gridSize === 1 ? 0 : (row / (gridSize - 1)) * 100}%`,
+                    backgroundSize: `${gridColumns * 100}% ${gridRows * 100}%`,
+                    backgroundPosition: `${gridColumns === 1 ? 0 : (col / (gridColumns - 1)) * 100}% ${gridRows === 1 ? 0 : (row / (gridRows - 1)) * 100}%`,
+                    aspectRatio: `${4 * gridRows} / ${3 * gridColumns}`,
                   }}
                 />;
               })}
