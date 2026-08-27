@@ -1,6 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { SiteHeader } from './components/site-header';
+import { SiteFooter } from './components/site-footer';
 
 type Photo = { id: string; url: string; label: string; credit: string };
 type PuzzleMode = 'classic' | 'shape';
@@ -227,10 +229,7 @@ export default function Home() {
 
   return (
     <main>
-      <header className="topbar">
-        <a className="brand" href="#top" aria-label="퍼즐리 홈"><span className="brand-mark">P</span><span>퍼즐리</span></a>
-        <span className="header-note">오늘도 한 조각씩, 천천히.</span>
-      </header>
+      <SiteHeader />
 
       <section className="hero" id="top">
         <div className="eyebrow"><span>✦</span> 나만의 이미지 퍼즐</div>
@@ -245,7 +244,7 @@ export default function Home() {
         <div className="quick-tags"><span>이런 건 어때요?</span>{['바다', '고양이', '도시 야경', '케이크'].map(tag => <button key={tag} onClick={() => { setKeyword(tag); const next = findPhotos(tag); setPhotos(next); setSelectedPhoto(next[0]); setSearched(tag); }}>#{tag}</button>)}</div>
       </section>
 
-      <section className="workspace" aria-labelledby="recommend-title">
+      <section className="workspace" id="make" aria-labelledby="recommend-title">
         <div className="section-heading">
           <div><span className="step">01</span><h2 id="recommend-title">‘{searched}’ 추천 그림</h2><p>퍼즐로 만들고 싶은 그림을 골라주세요.</p></div>
           <span className="result-count">4개의 그림</span>
@@ -363,7 +362,22 @@ export default function Home() {
         </div>}
       </section>}
 
-      <footer><a className="brand" href="#top"><span className="brand-mark">P</span><span>퍼즐리</span></a><p>당신의 오늘에, 작은 몰입을.</p><span>© 2026 Puzzly</span></footer>
+      <section className="home-content" aria-labelledby="learn-title">
+        <div className="content-lead"><span>PUZZLE NOTES</span><h2 id="learn-title">그림을 고르는 순간부터 퍼즐은 시작됩니다</h2><p>퍼즐리는 단순히 조각을 섞는 도구가 아니라, 한 장의 이미지를 색·선·질감으로 다시 읽어보는 공간입니다. 처음에는 큰 색 영역을 찾고, 익숙해지면 작은 굴곡과 반복 무늬까지 관찰해보세요.</p></div>
+        <div className="home-card-grid">
+          <article><span>01</span><h3>색이 나뉘는 그림부터</h3><p>하늘과 땅, 사물과 배경이 뚜렷한 이미지는 조각 위치를 예상하기 쉽습니다. 처음이라면 자연이나 도시 풍경으로 규칙을 익혀보세요.</p></article>
+          <article><span>02</span><h3>조각 수는 천천히 높이기</h3><p>12~20피스로 조작을 익힌 뒤 30~48피스로 넘어가면 부담이 적습니다. 80피스 이상은 미세한 색 변화와 질감을 보는 재미가 커집니다.</p></article>
+          <article><span>03</span><h3>막힐 때 원본 활용하기</h3><p>원본을 잠깐 확인해 사물의 위치와 경계선을 기억한 뒤 다시 숨겨보세요. 정답을 베끼기보다 새로운 단서를 찾는 참고 지도처럼 쓸 수 있습니다.</p></article>
+        </div>
+        <div className="mode-explainer">
+          <div><span>VERSION 1</span><h3>정사각형 교환은 이미지 흐름에 집중합니다</h3><p>조각 두 개를 선택해 위치를 바꾸는 방식입니다. 모양이 모두 같기 때문에 색의 연결, 선의 방향, 사물의 위치가 가장 중요한 단서가 됩니다.</p></div>
+          <div><span>VERSION 2</span><h3>직소 끼우기는 실루엣까지 살펴봅니다</h3><p>각기 다른 굴곡을 가진 조각을 같은 모양의 빈 홈에 놓습니다. 오른쪽 조각함에서 색과 윤곽을 함께 비교하며 원래 자리를 찾습니다.</p></div>
+        </div>
+        <div className="home-faq"><div><span>QUICK FAQ</span><h2>퍼즐리 이용 전 알아두세요</h2></div><div className="faq-list"><details><summary>회원가입이나 설치가 필요한가요?</summary><p>아니요. 웹 브라우저에서 바로 무료로 시작할 수 있으며 별도 계정을 만들 필요가 없습니다.</p></details><details><summary>검색어와 퍼즐 진행 내용이 저장되나요?</summary><p>현재 검색어와 진행 상태는 브라우저 화면 안에서 처리되며 퍼즐리 서버의 사용자 계정이나 데이터베이스에 저장하지 않습니다.</p></details><details><summary>모바일에서도 이용할 수 있나요?</summary><p>가능합니다. 다만 작은 화면에서 200~400피스는 조작이 세밀해질 수 있으므로 낮은 조각 수부터 시작하는 것을 권합니다.</p></details></div></div>
+        <div className="content-links"><a href="/guide">자세한 퍼즐 가이드 읽기 →</a><a href="/about">퍼즐리 운영 원칙 보기 →</a></div>
+      </section>
+
+      <SiteFooter />
     </main>
   );
 }

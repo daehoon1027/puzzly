@@ -1,0 +1,14 @@
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { InfoPage } from '../components/info-page';
+export const metadata: Metadata={title:'이미지 퍼즐 가이드',description:'이미지 선택부터 조각 수, 테두리와 색상 단서 활용까지 퍼즐을 즐기는 방법을 알아보세요.',alternates:{canonical:'/guide'}};
+export default function Page(){return <InfoPage eyebrow="PUZZLE GUIDE" title="이미지 퍼즐을 더 재미있게 맞추는 7가지 방법" intro="처음에는 복잡해 보여도 관찰 순서를 정하면 퍼즐이 훨씬 선명해집니다. 두 가지 모드에 모두 활용할 수 있는 방법을 정리했습니다.">
+<section><h2>1. 특징이 분명한 그림부터 고르기</h2><p>첫 퍼즐이라면 하늘, 숲, 건물처럼 영역별 색이 구분되는 이미지를 추천합니다. 비슷한 색이 화면 전체에 반복되는 사진은 아름답지만 난도가 높습니다. 이미지 속에서 가장 눈에 띄는 사물 하나와 색상 두세 가지를 먼저 찾아보세요.</p></section>
+<section><h2>2. 조각 수는 성공 경험에 맞춰 늘리기</h2><p>12~20피스는 화면 조작과 규칙을 익히기 좋고, 30~48피스는 짧은 집중에 알맞습니다. 80~120피스부터는 비슷한 색과 질감을 세밀하게 비교해야 하며, 200~400피스는 긴 호흡으로 나누어 도전하기 좋습니다. 한 단계를 완성한 뒤 늘리면 이미지 단서를 읽는 감각이 자연스럽게 생깁니다.</p><div className="guide-table" role="table" aria-label="퍼즐 난이도 가이드"><div role="row"><b>조각 수</b><b>추천 대상</b><b>관찰 포인트</b></div><div role="row"><span>12–20</span><span>처음 시작</span><span>큰 색 영역과 사물 위치</span></div><div role="row"><span>30–48</span><span>가벼운 집중</span><span>테두리와 윤곽선</span></div><div role="row"><span>80–120</span><span>익숙한 사용자</span><span>작은 색 변화와 질감</span></div><div role="row"><span>200–400</span><span>긴 도전</span><span>반복 무늬와 조각 굴곡</span></div></div></section>
+<section><h2>3. 그림을 몇 개의 영역으로 나누어 보기</h2><p>하늘·지면·중심 사물처럼 그림을 큰 덩어리로 나누면 조각의 예상 위치를 좁힐 수 있습니다. 정사각형 교환 모드에서는 왼쪽 위에서 오른쪽 아래로 색 흐름을 따라가고, 직소 모드에서는 같은 색 계열을 먼저 눈으로 묶어보세요.</p></section>
+<section><h2>4. 테두리와 모서리를 기준점으로 삼기</h2><p>버전 1에서는 이미지의 네 모서리에 나타날 법한 조각을 먼저 찾습니다. 버전 2에서는 바깥쪽이 평평한 조각이 테두리에 놓입니다. 기준점 몇 개만 맞아도 주변 조각의 방향과 위치를 추측하기 쉬워집니다.</p></section>
+<section><h2>5. 색뿐 아니라 선과 질감도 비교하기</h2><p>푸른 조각이 모두 하늘은 아닙니다. 수평선, 나뭇가지, 건물 모서리처럼 이어지는 선을 찾고, 물결·나뭇잎·돌 표면 같은 질감의 방향을 비교하세요. 비슷한 색 사이에서 정답을 찾을 때 유용한 단서입니다.</p></section>
+<section><h2>6. 원본 보기는 막힐 때 짧게 사용하기</h2><p>원본 이미지를 계속 띄워두기보다 막힌 순간에만 확인하면 기억과 관찰을 함께 활용할 수 있습니다. 특정 사물의 위치나 색 경계 한두 개만 기억하고 다시 퍼즐에 집중해보세요.</p></section>
+<section><h2>7. 오래 막히면 난도를 낮추거나 잠시 쉬기</h2><p>퍼즐은 경쟁이 아닙니다. 작은 화면에서는 조각이 많을수록 세밀한 조작이 어려울 수 있으므로 낮은 조각 수로 시작하는 편이 편안합니다. 같은 그림을 더 적은 조각으로 완성한 뒤 다시 도전하는 것도 좋은 방법입니다.</p></section>
+<section><h2>자주 묻는 질문</h2><div className="faq-list"><details><summary>퍼즐 진행 내용이 저장되나요?</summary><p>현재 퍼즐 상태는 브라우저 화면 안에서만 동작하며 계정이나 서버에 저장되지 않습니다. 페이지를 새로고침하면 새로 시작해야 합니다.</p></details><details><summary>원하는 검색어의 이미지가 정확히 나오지 않아요.</summary><p>일부 주제는 선별된 이미지 묶음에서 추천하고 그 밖의 검색어는 외부 이미지 제공처의 결과를 활용합니다. 더 구체적인 단어로 다시 검색해보세요.</p></details><details><summary>직소 조각이 홈에 들어가지 않아요.</summary><p>버전 2에서는 조각의 굴곡과 이미지가 일치하는 원래 자리만 정답으로 처리됩니다. 조각을 누른 다음 같은 모양의 홈을 눌러도 놓을 수 있습니다.</p></details><details><summary>무료로 이용할 수 있나요?</summary><p>현재 퍼즐 만들기와 플레이 기능은 회원가입 없이 무료로 이용할 수 있습니다.</p></details></div></section>
+<aside className="info-cta"><h2>가이드를 읽었다면 한 장 골라볼까요?</h2><p>처음에는 색 구분이 분명한 자연이나 도시 이미지를 추천합니다.</p><Link href="/#make">퍼즐 시작하기 →</Link></aside></InfoPage>}
