@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 
 type Photo = { id: string; url: string; label: string; credit: string };
+type PuzzleMode = 'classic' | 'shape';
 
 const photoSets: Record<string, Photo[]> = {
   nature: [
@@ -65,14 +66,28 @@ function shuffled(count: number) {
   return items;
 }
 
+function pieceClipPath(piece: number) {
+  let seed = (piece + 1) * 9301 + 49297;
+  const next = () => {
+    seed = (seed * 233280 + 17) % 100003;
+    return seed / 100003;
+  };
+  const jitter = Array.from({ length: 12 }, () => Math.round(next() * 8) - 4);
+  return `polygon(7% 0%, ${36 + jitter[0]}% 0%, ${50 + jitter[1]}% 9%, ${64 + jitter[2]}% 0%, 93% 0%, 100% 7%, 100% ${36 + jitter[3]}%, 91% ${50 + jitter[4]}%, 100% ${64 + jitter[5]}%, 100% 93%, 93% 100%, ${64 + jitter[6]}% 100%, ${50 + jitter[7]}% 91%, ${36 + jitter[8]}% 100%, 7% 100%, 0% 93%, 0% ${64 + jitter[9]}%, 9% ${50 + jitter[10]}%, 0% ${36 + jitter[11]}%, 0% 7%)`;
+}
+
 export default function Home() {
   const [keyword, setKeyword] = useState('알프스의 봄');
   const [searched, setSearched] = useState('알프스의 봄');
   const [photos, setPhotos] = useState(photoSets.nature);
   const [selectedPhoto, setSelectedPhoto] = useState(photoSets.nature[0]);
   const [pieceCount, setPieceCount] = useState(16);
+  const [mode, setMode] = useState<PuzzleMode>('classic');
   const [pieces, setPieces] = useState<number[] | null>(null);
   const [picked, setPicked] = useState<number | null>(null);
+  const [placed, setPlaced] = useState<number[]>([]);
+  const [selectedTrayPiece, setSelectedTrayPiece] = useState<number | null>(null);
+  const [missedSlot, setMissedSlot] = useState<number | null>(null);
   const [moves, setMoves] = useState(0);
   const [completed, setCompleted] = useState(false);
   const [showReference, setShowReference] = useState(false);
@@ -80,8 +95,9 @@ export default function Home() {
   const gridSize = Math.sqrt(pieceCount);
   const progress = useMemo(() => {
     if (!pieces) return 0;
+    if (mode === 'shape') return Math.round((placed.length / pieces.length) * 100);
     return Math.round((pieces.filter((piece, index) => piece === index).length / pieces.length) * 100);
-  }, [pieces]);
+  }, [mode, pieces, placed.length]);
 
   function recommend() {
     const next = findPhotos(keyword);
@@ -93,13 +109,16 @@ export default function Home() {
   function startPuzzle() {
     setPieces(shuffled(pieceCount));
     setPicked(null);
+    setPlaced([]);
+    setSelectedTrayPiece(null);
+    setMissedSlot(null);
     setMoves(0);
     setCompleted(false);
     setTimeout(() => document.getElementById('puzzle')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
   }
 
   function selectPiece(index: number) {
-    if (!pieces || completed) return;
+    if (!pieces || completed || mode !== 'classic') return;
     if (picked === null) { setPicked(index); return; }
     if (picked === index) { setPicked(null); return; }
     const next = [...pieces];
@@ -108,6 +127,20 @@ export default function Home() {
     setPicked(null);
     setMoves((value) => value + 1);
     setCompleted(next.every((piece, pieceIndex) => piece === pieceIndex));
+  }
+
+  function placeShapePiece(piece: number, slot: number) {
+    if (!pieces || completed || placed.includes(piece)) return;
+    setMoves((value) => value + 1);
+    if (piece !== slot) {
+      setMissedSlot(slot);
+      window.setTimeout(() => setMissedSlot(null), 350);
+      return;
+    }
+    const nextPlaced = [...placed, piece];
+    setPlaced(nextPlaced);
+    setSelectedTrayPiece(null);
+    setCompleted(nextPlaced.length === pieceCount);
   }
 
   return (
@@ -145,21 +178,42 @@ export default function Home() {
           ))}
         </div>
 
+        <div className="mode-section">
+          <div className="setup-copy"><span className="step">02</span><h2>어떤 방식으로 맞출까요?</h2><p>정사각형을 바꾸거나, 자유로운 모양을 빈자리에 끼워보세요.</p></div>
+          <div className="mode-picker" role="group" aria-label="퍼즐 버전 선택">
+            <button className={mode === 'classic' ? 'active' : ''} onClick={() => setMode('classic')} aria-pressed={mode === 'classic'}>
+              <span className="mode-visual classic-visual"><i/><i/><i/><i/></span>
+              <span><b>버전 1</b><small>정사각형 교환</small></span>
+              <em>{mode === 'classic' ? '✓' : ''}</em>
+            </button>
+            <button className={mode === 'shape' ? 'active' : ''} onClick={() => setMode('shape')} aria-pressed={mode === 'shape'}>
+              <span className="mode-visual shape-visual"><i/><i/><i/></span>
+              <span><b>버전 2</b><small>랜덤 모양 끼우기</small></span>
+              <em>{mode === 'shape' ? '✓' : ''}</em>
+            </button>
+          </div>
+        </div>
+
         <div className="setup-card">
-          <div className="setup-copy"><span className="step">02</span><h2>몇 조각으로 도전할까요?</h2><p>조각이 많을수록 더 오래, 더 깊게 몰입할 수 있어요.</p></div>
+          <div className="setup-copy"><span className="step">03</span><h2>몇 조각으로 도전할까요?</h2><p>조각이 많을수록 더 오래, 더 깊게 몰입할 수 있어요.</p></div>
           <div className="difficulty" role="group" aria-label="퍼즐 조각 수">
             {difficulties.map(count => <button key={count} onClick={() => setPieceCount(count)} className={pieceCount === count ? 'active' : ''}><b>{count}</b><span>피스</span></button>)}
           </div>
-          <button className="start-button" onClick={startPuzzle}>퍼즐 시작하기 <span>→</span></button>
+          <button className="start-button" onClick={startPuzzle}>{mode === 'classic' ? '버전 1 시작하기' : '버전 2 시작하기'} <span>→</span></button>
         </div>
       </section>
 
       {pieces && <section className="puzzle-section" id="puzzle">
         <div className="puzzle-top">
-          <div><span className="step light">PLAY</span><h2>{completed ? '멋지게 완성했어요!' : '한 조각씩 맞춰보세요'}</h2><p>{completed ? `${moves}번의 이동으로 퍼즐을 완성했습니다.` : '옮길 조각과 자리를 차례로 눌러 서로 바꿔보세요.'}</p></div>
+          <div>
+            <span className="step light">{mode === 'classic' ? 'VER.1' : 'VER.2'}</span>
+            <h2>{completed ? '멋지게 완성했어요!' : mode === 'classic' ? '정사각형 조각을 맞춰보세요' : '모양을 보고 빈자리에 끼워보세요'}</h2>
+            <p>{completed ? `${moves}번의 이동으로 퍼즐을 완성했습니다.` : mode === 'classic' ? '옮길 조각과 자리를 차례로 눌러 서로 바꿔보세요.' : '오른쪽 조각을 끌어다 같은 모양의 빈 홈에 놓거나, 조각과 홈을 차례로 누르세요.'}</p>
+          </div>
           <div className="puzzle-actions"><button onClick={() => setShowReference(!showReference)}>◉ 원본 {showReference ? '숨기기' : '보기'}</button><button onClick={startPuzzle}>↻ 다시 섞기</button></div>
         </div>
-        <div className="game-layout">
+
+        {mode === 'classic' ? <div className="game-layout">
           <div className="board-wrap">
             <div className={`puzzle-board ${completed ? 'complete' : ''}`} style={{ gridTemplateColumns: `repeat(${gridSize}, 1fr)` }}>
               {pieces.map((piece, index) => {
@@ -175,7 +229,63 @@ export default function Home() {
             <div className="mini-stats"><p><span>조각 수</span><b>{pieceCount}</b></p><p><span>이동 횟수</span><b>{moves}</b></p></div>
             <div className="tip"><span>TIP</span><p>모서리와 테두리 조각부터 맞추면 더 쉬워요.</p></div>
           </aside>
-        </div>
+        </div> : <div className="shape-game-layout">
+          <div className="board-wrap">
+            <div className={`shape-board ${completed ? 'complete' : ''}`} style={{ gridTemplateColumns: `repeat(${gridSize}, 1fr)` }}>
+              {pieces.map((_, slot) => {
+                const row = Math.floor(slot / gridSize);
+                const col = slot % gridSize;
+                const isPlaced = placed.includes(slot);
+                return <button
+                  key={slot}
+                  className={`shape-slot ${missedSlot === slot ? 'miss' : ''}`}
+                  aria-label={`${slot + 1}번 모양의 빈자리`}
+                  onClick={() => selectedTrayPiece !== null && placeShapePiece(selectedTrayPiece, slot)}
+                  onDragOver={(event) => event.preventDefault()}
+                  onDrop={(event) => { event.preventDefault(); const piece = Number(event.dataTransfer.getData('text/plain')); if (Number.isInteger(piece)) placeShapePiece(piece, slot); }}
+                >
+                  <span
+                    className={isPlaced ? 'placed-shape' : 'hole-shape'}
+                    style={{
+                      clipPath: pieceClipPath(slot),
+                      backgroundImage: isPlaced ? `url(${selectedPhoto.url})` : undefined,
+                      backgroundSize: `${gridSize * 100}% ${gridSize * 100}%`,
+                      backgroundPosition: `${gridSize === 1 ? 0 : (col / (gridSize - 1)) * 100}% ${gridSize === 1 ? 0 : (row / (gridSize - 1)) * 100}%`,
+                    }}
+                  />
+                </button>;
+              })}
+            </div>
+            {showReference && <div className="reference"><img src={selectedPhoto.url} alt={`원본: ${selectedPhoto.label}`} /><span>원본</span></div>}
+          </div>
+
+          <aside className="piece-tray">
+            <div className="tray-heading"><div><span>조각함</span><b>{pieceCount - placed.length}개 남음</b></div><small>끌어서 왼쪽 홈에 놓으세요</small></div>
+            <div className="tray-progress"><i style={{ width: `${progress}%` }}/><span>{progress}%</span></div>
+            <div className={`tray-grid tray-${pieceCount}`}>
+              {pieces.filter((piece) => !placed.includes(piece)).map((piece) => {
+                const row = Math.floor(piece / gridSize);
+                const col = piece % gridSize;
+                return <button
+                  key={piece}
+                  draggable
+                  className={`tray-piece ${selectedTrayPiece === piece ? 'selected' : ''}`}
+                  aria-label={`${piece + 1}번 퍼즐 조각`}
+                  aria-pressed={selectedTrayPiece === piece}
+                  onClick={() => setSelectedTrayPiece(selectedTrayPiece === piece ? null : piece)}
+                  onDragStart={(event) => { event.dataTransfer.setData('text/plain', String(piece)); setSelectedTrayPiece(piece); }}
+                  style={{
+                    clipPath: pieceClipPath(piece),
+                    backgroundImage: `url(${selectedPhoto.url})`,
+                    backgroundSize: `${gridSize * 100}% ${gridSize * 100}%`,
+                    backgroundPosition: `${gridSize === 1 ? 0 : (col / (gridSize - 1)) * 100}% ${gridSize === 1 ? 0 : (row / (gridSize - 1)) * 100}%`,
+                  }}
+                />;
+              })}
+            </div>
+            <div className="tray-footer"><span>이동 {moves}회</span><p><b>TIP</b> 색과 모양을 함께 살펴보세요.</p></div>
+          </aside>
+        </div>}
       </section>}
 
       <footer><a className="brand" href="#top"><span className="brand-mark">P</span><span>퍼즐리</span></a><p>당신의 오늘에, 작은 몰입을.</p><span>© 2026 Puzzly</span></footer>
