@@ -37,7 +37,7 @@ const photoSets: Record<string, Photo[]> = {
   ],
 };
 
-const difficulties = [4, 9, 16, 25, 36, 49, 64, 100];
+const difficulties = [9, 16, 25, 36, 49, 64, 100, 400];
 
 function findPhotos(keyword: string) {
   const word = keyword.trim().toLowerCase();
