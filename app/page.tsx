@@ -83,21 +83,79 @@ function gridDimensions(count: number) {
   return { rows: bestRows, columns: bestColumns };
 }
 
-function pieceClipPath(piece: number) {
-  let seed = (piece + 1) * 9301 + 49297;
-  const next = () => {
-    seed = (seed * 16807) % 2147483647;
-    return seed / 2147483647;
+type EdgeProfile = { sign: number; offset: number; size: number } | null;
+
+function boundaryProfile(axis: 'horizontal' | 'vertical', row: number, column: number): Exclude<EdgeProfile, null> {
+  let seed = (((row + 11) * 73856093) ^ ((column + 17) * 19349663) ^ (axis === 'vertical' ? 83492791 : 2654435761)) >>> 0;
+  seed = (seed * 1664525 + 1013904223) >>> 0;
+  return {
+    sign: seed % 2 === 0 ? 1 : -1,
+    offset: (((seed >>> 3) % 21) - 10) / 100,
+    size: 0.13 + ((seed >>> 9) % 7) / 100,
   };
-  const vertexCount = 7 + Math.floor(next() * 7);
-  const points = Array.from({ length: vertexCount }, (_, index) => {
-    const angle = (Math.PI * 2 * index) / vertexCount + (next() - 0.5) * 0.28;
-    const radius = 38 + next() * 15;
-    const x = Math.max(2, Math.min(98, 50 + Math.cos(angle) * radius));
-    const y = Math.max(2, Math.min(98, 50 + Math.sin(angle) * radius));
-    return `${x.toFixed(1)}% ${y.toFixed(1)}%`;
-  });
-  return `polygon(${points.join(', ')})`;
+}
+
+function pieceEdges(row: number, column: number, rows: number, columns: number) {
+  const topSource = row === 0 ? null : boundaryProfile('horizontal', row - 1, column);
+  const leftSource = column === 0 ? null : boundaryProfile('vertical', row, column - 1);
+  return {
+    top: topSource ? { ...topSource, sign: -topSource.sign } : null,
+    right: column === columns - 1 ? null : boundaryProfile('vertical', row, column),
+    bottom: row === rows - 1 ? null : boundaryProfile('horizontal', row, column),
+    left: leftSource ? { ...leftSource, sign: -leftSource.sign } : null,
+  };
+}
+
+function piecePath(piece: number, rows: number, columns: number) {
+  const row = Math.floor(piece / columns);
+  const column = piece % columns;
+  const width = 100;
+  const height = (75 * columns) / rows;
+  const pad = 0;
+  const edges = pieceEdges(row, column, rows, columns);
+  const commands = [`M ${pad} ${pad}`];
+
+  const horizontal = (edge: EdgeProfile, start: number, end: number, y: number, direction: 1 | -1, outward: 1 | -1) => {
+    if (!edge) return `L ${end} ${y}`;
+    const center = width * (0.5 + edge.offset);
+    const radius = Math.min(width, height) * edge.size;
+    const targetY = y + outward * edge.sign * radius;
+    return `L ${center - direction * radius} ${y} C ${center - direction * radius * 0.55} ${y} ${center - direction * radius * 0.62} ${targetY} ${center} ${targetY} C ${center + direction * radius * 0.62} ${targetY} ${center + direction * radius * 0.55} ${y} ${center + direction * radius} ${y} L ${end} ${y}`;
+  };
+  const vertical = (edge: EdgeProfile, start: number, end: number, x: number, direction: 1 | -1, outward: 1 | -1) => {
+    if (!edge) return `L ${x} ${end}`;
+    const center = height * (0.5 + edge.offset);
+    const radius = Math.min(width, height) * edge.size;
+    const targetX = x + outward * edge.sign * radius;
+    return `L ${x} ${center - direction * radius} C ${x} ${center - direction * radius * 0.55} ${targetX} ${center - direction * radius * 0.62} ${targetX} ${center} C ${targetX} ${center + direction * radius * 0.62} ${x} ${center + direction * radius * 0.55} ${x} ${center + direction * radius} L ${x} ${end}`;
+  };
+
+  commands.push(horizontal(edges.top, pad, width - pad, pad, 1, -1));
+  commands.push(vertical(edges.right, pad, height - pad, width - pad, 1, 1));
+  commands.push(horizontal(edges.bottom, width - pad, pad, height - pad, -1, 1));
+  commands.push(vertical(edges.left, height - pad, pad, pad, -1, -1));
+  commands.push('Z');
+  return { d: commands.join(' '), height, row, column };
+}
+
+function JigsawPiece({ piece, rows, columns, imageUrl, showImage, variant, className = '' }: {
+  piece: number;
+  rows: number;
+  columns: number;
+  imageUrl: string;
+  showImage: boolean;
+  variant: string;
+  className?: string;
+}) {
+  const { d, height, row, column } = piecePath(piece, rows, columns);
+  const clipId = `${variant}-piece-${piece}`;
+  return <svg className={className} viewBox={`0 0 100 ${height}`} aria-hidden="true">
+    <defs><clipPath id={clipId}><path d={d}/></clipPath></defs>
+    {showImage ? <>
+      <image href={imageUrl} x={-column * 100} y={-row * height} width={columns * 100} height={rows * height} preserveAspectRatio="none" clipPath={`url(#${clipId})`}/>
+      <path d={d} fill="none" stroke="rgba(255,255,255,.5)" strokeWidth="1.2" vectorEffect="non-scaling-stroke"/>
+    </> : <path className="jigsaw-hole-path" d={d}/>}
+  </svg>;
 }
 
 export default function Home() {
@@ -257,25 +315,23 @@ export default function Home() {
           <div className="board-wrap">
             <div className={`shape-board ${completed ? 'complete' : ''}`} style={{ gridTemplateColumns: `repeat(${gridColumns}, 1fr)`, gridTemplateRows: `repeat(${gridRows}, 1fr)` }}>
               {pieces.map((_, slot) => {
-                const row = Math.floor(slot / gridColumns);
-                const col = slot % gridColumns;
                 const isPlaced = placed.includes(slot);
                 return <button
                   key={slot}
                   className={`shape-slot ${missedSlot === slot ? 'miss' : ''}`}
-                  aria-label={`${slot + 1}번 모양의 빈자리`}
+                  aria-label={`${slot + 1}번 직소 모양의 빈자리`}
                   onClick={() => selectedTrayPiece !== null && placeShapePiece(selectedTrayPiece, slot)}
                   onDragOver={(event) => event.preventDefault()}
                   onDrop={(event) => { event.preventDefault(); const piece = Number(event.dataTransfer.getData('text/plain')); if (Number.isInteger(piece)) placeShapePiece(piece, slot); }}
                 >
-                  <span
+                  <JigsawPiece
+                    piece={slot}
+                    rows={gridRows}
+                    columns={gridColumns}
+                    imageUrl={selectedPhoto.url}
+                    showImage={isPlaced}
+                    variant="slot"
                     className={isPlaced ? 'placed-shape' : 'hole-shape'}
-                    style={{
-                      clipPath: pieceClipPath(slot),
-                      backgroundImage: isPlaced ? `url(${selectedPhoto.url})` : undefined,
-                      backgroundSize: `${gridColumns * 100}% ${gridRows * 100}%`,
-                      backgroundPosition: `${gridColumns === 1 ? 0 : (col / (gridColumns - 1)) * 100}% ${gridRows === 1 ? 0 : (row / (gridRows - 1)) * 100}%`,
-                    }}
                   />
                 </button>;
               })}
@@ -287,26 +343,20 @@ export default function Home() {
             <div className="tray-heading"><div><span>조각함</span><b>{pieceCount - placed.length}개 남음</b></div><small>끌어서 왼쪽 홈에 놓으세요</small></div>
             <div className="tray-progress"><i style={{ width: `${progress}%` }}/><span>{progress}%</span></div>
             <div className={`tray-grid tray-${pieceCount}`}>
-              {pieces.filter((piece) => !placed.includes(piece)).map((piece) => {
-                const row = Math.floor(piece / gridColumns);
-                const col = piece % gridColumns;
-                return <button
+              {pieces.filter((piece) => !placed.includes(piece)).map((piece) => (
+                <button
                   key={piece}
                   draggable
                   className={`tray-piece ${selectedTrayPiece === piece ? 'selected' : ''}`}
-                  aria-label={`${piece + 1}번 퍼즐 조각`}
+                  aria-label={`${piece + 1}번 직소 퍼즐 조각`}
                   aria-pressed={selectedTrayPiece === piece}
                   onClick={() => setSelectedTrayPiece(selectedTrayPiece === piece ? null : piece)}
                   onDragStart={(event) => { event.dataTransfer.setData('text/plain', String(piece)); setSelectedTrayPiece(piece); }}
-                  style={{
-                    clipPath: pieceClipPath(piece),
-                    backgroundImage: `url(${selectedPhoto.url})`,
-                    backgroundSize: `${gridColumns * 100}% ${gridRows * 100}%`,
-                    backgroundPosition: `${gridColumns === 1 ? 0 : (col / (gridColumns - 1)) * 100}% ${gridRows === 1 ? 0 : (row / (gridRows - 1)) * 100}%`,
-                    aspectRatio: `${4 * gridRows} / ${3 * gridColumns}`,
-                  }}
-                />;
-              })}
+                  style={{ aspectRatio: `${4 * gridRows} / ${3 * gridColumns}` }}
+                >
+                  <JigsawPiece piece={piece} rows={gridRows} columns={gridColumns} imageUrl={selectedPhoto.url} showImage variant="tray" className="tray-piece-svg"/>
+                </button>
+              ))}
             </div>
             <div className="tray-footer"><span>이동 {moves}회</span><p><b>TIP</b> 색과 모양을 함께 살펴보세요.</p></div>
           </aside>
