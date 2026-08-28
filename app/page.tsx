@@ -51,16 +51,20 @@ function withUnsplashCredit(photos: Photo[]) {
 
 function findPhotos(keyword: string) {
   const word = keyword.trim().toLowerCase();
-  if (/바다|해변|여름|파도|섬|휴가|ocean|sea|beach/.test(word)) return withUnsplashCredit(photoSets.ocean);
-  if (/동물|고양|강아|여우|코끼|새|말|사자|animal|cat|dog/.test(word)) return withUnsplashCredit(photoSets.animal);
-  if (/도시|서울|야경|건물|거리|자동차|건축|city|street|night/.test(word)) return withUnsplashCredit(photoSets.city);
-  if (/음식|요리|케이크|피자|커피|디저트|food|cake|pizza/.test(word)) return withUnsplashCredit(photoSets.food);
-  if (/산|숲|자연|알프스|꽃|정원|봄|가을|nature|forest|mountain/.test(word) || !word) return withUnsplashCredit(photoSets.nature);
-
   let seed = 0;
   for (const character of word) seed = (seed * 31 + character.charCodeAt(0)) >>> 0;
-  const start = seed % curatedPhotos.length;
-  return withUnsplashCredit(Array.from({ length: 4 }, (_, index) => curatedPhotos[(start + index * 3) % curatedPhotos.length]));
+
+  let preferred: Photo[] = [];
+  if (/바다|해변|여름|파도|섬|휴가|ocean|sea|beach/.test(word)) preferred = photoSets.ocean;
+  else if (/동물|고양|강아|여우|코끼|새|말|사자|animal|cat|dog/.test(word)) preferred = photoSets.animal;
+  else if (/도시|서울|야경|건물|거리|자동차|건축|city|street|night/.test(word)) preferred = photoSets.city;
+  else if (/음식|요리|케이크|피자|커피|디저트|food|cake|pizza/.test(word)) preferred = photoSets.food;
+  else if (/산|숲|자연|알프스|꽃|정원|봄|가을|nature|forest|mountain/.test(word) || !word) preferred = photoSets.nature;
+
+  const remaining = curatedPhotos.filter((photo) => !preferred.some((item) => item.id === photo.id));
+  const start = remaining.length ? seed % remaining.length : 0;
+  const rotated = [...remaining.slice(start), ...remaining.slice(0, start)];
+  return withUnsplashCredit([...preferred, ...rotated].slice(0, 10));
 }
 
 function shuffled(count: number) {
@@ -207,7 +211,7 @@ export default function Home() {
         }
         throw new Error(data.error ?? 'search failed');
       }
-      if (!data.photos || data.photos.length < 4) throw new Error('not enough photos');
+      if (!data.photos || data.photos.length < 10) throw new Error('not enough photos');
       setPhotos(data.photos);
       setSelectedPhoto(data.photos[0]);
       setSearched(term);
@@ -277,13 +281,18 @@ export default function Home() {
           <button onClick={() => void recommend()} disabled={searching}>{searching ? '찾는 중...' : '그림 찾기'} <span>→</span></button>
         </div>
         <div className="quick-tags"><span>이런 건 어때요?</span>{['바다', '고양이', '도시 야경', '케이크'].map(tag => <button key={tag} disabled={searching} onClick={() => { setKeyword(tag); void recommend(tag); }}>#{tag}</button>)}</div>
+        <div className="search-guide">
+          <b>검색어 안내</b>
+          <p>사물·장소·분위기나 인물의 특징과 상황을 구체적으로 적으면 더 잘 찾을 수 있어요. 예: ‘웃는 가족’, ‘빨간 우산을 든 사람’.</p>
+          <p>특정 인물의 이름은 정확하지 않을 수 있습니다. Pexels 검색은 얼굴 인식이나 신원 확인 기능이 아니어서 동명이인 또는 비슷한 분위기의 다른 인물이 표시될 수 있으며, 검색 결과가 당사자임을 보장하지 않습니다.</p>
+        </div>
         {searchMessage && <p className="search-message" role="status" aria-live="polite">{searchMessage}</p>}
       </section>
 
       <section className="workspace" id="make" aria-labelledby="recommend-title">
         <div className="section-heading">
           <div><span className="step">01</span><h2 id="recommend-title">‘{searched}’ 추천 그림</h2><p>퍼즐로 만들고 싶은 그림을 골라주세요.</p></div>
-          <span className="result-count">4개의 그림</span>
+          <span className="result-count">{photos.length}개의 그림</span>
         </div>
         <div className="photo-grid">
           {photos.map((photo) => (

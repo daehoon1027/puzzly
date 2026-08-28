@@ -193,4 +193,7 @@ footer { min-height:150px; padding:40px max(24px,calc((100% - 1120px)/2)); displ
 .photo-source { display:inline-block; margin:9px 4px 0; color:#756e64; font-size:10px; line-height:1.4; text-decoration:none; }
 a.photo-source:hover { color:var(--orange); text-decoration:underline; }
 .search-message { margin:12px auto 0; color:#6f685e; font-size:12px; }
+.search-guide { max-width:760px; margin:18px auto 0; padding:14px 18px; border:1px solid #e4ddd2; border-radius:14px; background:rgba(255,255,255,.62); color:#6f685e; font-size:12px; line-height:1.65; text-align:left; }
+.search-guide b { display:block; margin-bottom:3px; color:#3e3932; }
+.search-guide p { margin:2px 0; }
 .search-box button:disabled,.quick-tags button:disabled { cursor:wait; opacity:.65; }
