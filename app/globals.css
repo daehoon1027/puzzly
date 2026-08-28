@@ -187,3 +187,10 @@ footer { min-height:150px; padding:40px max(24px,calc((100% - 1120px)/2)); displ
 @media (max-width:760px) {
   .article-links { grid-template-columns:1fr; }
 }
+
+.photo-result { min-width:0; }
+.photo-result .photo-card { width:100%; }
+.photo-source { display:inline-block; margin:9px 4px 0; color:#756e64; font-size:10px; line-height:1.4; text-decoration:none; }
+a.photo-source:hover { color:var(--orange); text-decoration:underline; }
+.search-message { margin:12px auto 0; color:#6f685e; font-size:12px; }
+.search-box button:disabled,.quick-tags button:disabled { cursor:wait; opacity:.65; }

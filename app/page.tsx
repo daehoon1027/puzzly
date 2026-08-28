@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react';
 import { SiteHeader } from './components/site-header';
 import { SiteFooter } from './components/site-footer';
 
-type Photo = { id: string; url: string; label: string; credit: string };
+type Photo = { id: string; url: string; label: string; credit: string; sourceUrl?: string; photographerUrl?: string };
 type PuzzleMode = 'classic' | 'shape';
 
 const photoSets: Record<string, Photo[]> = {
@@ -45,18 +45,22 @@ const difficulties = [12, 20, 30, 48, 80, 120, 200, 400];
 
 const curatedPhotos = Object.values(photoSets).flat();
 
+function withUnsplashCredit(photos: Photo[]) {
+  return photos.map((photo) => ({ ...photo, credit: 'Photo from Unsplash', sourceUrl: 'https://unsplash.com' }));
+}
+
 function findPhotos(keyword: string) {
   const word = keyword.trim().toLowerCase();
-  if (/바다|해변|여름|파도|섬|휴가|ocean|sea|beach/.test(word)) return photoSets.ocean;
-  if (/동물|고양|강아|여우|코끼|새|말|사자|animal|cat|dog/.test(word)) return photoSets.animal;
-  if (/도시|서울|야경|건물|거리|자동차|건축|city|street|night/.test(word)) return photoSets.city;
-  if (/음식|요리|케이크|피자|커피|디저트|food|cake|pizza/.test(word)) return photoSets.food;
-  if (/산|숲|자연|알프스|꽃|정원|봄|가을|nature|forest|mountain/.test(word) || !word) return photoSets.nature;
+  if (/바다|해변|여름|파도|섬|휴가|ocean|sea|beach/.test(word)) return withUnsplashCredit(photoSets.ocean);
+  if (/동물|고양|강아|여우|코끼|새|말|사자|animal|cat|dog/.test(word)) return withUnsplashCredit(photoSets.animal);
+  if (/도시|서울|야경|건물|거리|자동차|건축|city|street|night/.test(word)) return withUnsplashCredit(photoSets.city);
+  if (/음식|요리|케이크|피자|커피|디저트|food|cake|pizza/.test(word)) return withUnsplashCredit(photoSets.food);
+  if (/산|숲|자연|알프스|꽃|정원|봄|가을|nature|forest|mountain/.test(word) || !word) return withUnsplashCredit(photoSets.nature);
 
   let seed = 0;
   for (const character of word) seed = (seed * 31 + character.charCodeAt(0)) >>> 0;
   const start = seed % curatedPhotos.length;
-  return Array.from({ length: 4 }, (_, index) => curatedPhotos[(start + index * 3) % curatedPhotos.length]);
+  return withUnsplashCredit(Array.from({ length: 4 }, (_, index) => curatedPhotos[(start + index * 3) % curatedPhotos.length]));
 }
 
 function shuffled(count: number) {
@@ -164,8 +168,11 @@ function JigsawPiece({ piece, rows, columns, imageUrl, showImage, variant, class
 export default function Home() {
   const [keyword, setKeyword] = useState('알프스의 봄');
   const [searched, setSearched] = useState('알프스의 봄');
-  const [photos, setPhotos] = useState(photoSets.nature);
-  const [selectedPhoto, setSelectedPhoto] = useState(photoSets.nature[0]);
+  const defaultPhotos = useMemo(() => withUnsplashCredit(photoSets.nature), []);
+  const [photos, setPhotos] = useState(defaultPhotos);
+  const [selectedPhoto, setSelectedPhoto] = useState(defaultPhotos[0]);
+  const [searching, setSearching] = useState(false);
+  const [searchMessage, setSearchMessage] = useState('');
   const [pieceCount, setPieceCount] = useState(20);
   const [mode, setMode] = useState<PuzzleMode>('classic');
   const [pieces, setPieces] = useState<number[] | null>(null);
@@ -185,11 +192,34 @@ export default function Home() {
     return Math.round((pieces.filter((piece, index) => piece === index).length / pieces.length) * 100);
   }, [mode, pieces, placed.length]);
 
-  function recommend() {
-    const next = findPhotos(keyword);
-    setPhotos(next);
-    setSelectedPhoto(next[0]);
-    setSearched(keyword.trim() || '자연');
+  async function recommend(searchKeyword = keyword) {
+    if (searching) return;
+    const term = searchKeyword.trim() || '자연';
+    setSearching(true);
+    setSearchMessage('');
+    try {
+      const response = await fetch(`/api/photos?q=${encodeURIComponent(term)}`);
+      const data = (await response.json()) as { photos?: Photo[]; error?: string };
+      if (!response.ok) {
+        if (response.status === 400) {
+          setSearchMessage(data.error ?? '검색어를 다시 확인해 주세요.');
+          return;
+        }
+        throw new Error(data.error ?? 'search failed');
+      }
+      if (!data.photos || data.photos.length < 4) throw new Error('not enough photos');
+      setPhotos(data.photos);
+      setSelectedPhoto(data.photos[0]);
+      setSearched(term);
+    } catch {
+      const fallback = findPhotos(term);
+      setPhotos(fallback);
+      setSelectedPhoto(fallback[0]);
+      setSearched(term);
+      setSearchMessage('실시간 검색이 원활하지 않아 선별 이미지를 보여드려요.');
+    } finally {
+      setSearching(false);
+    }
   }
 
   function startPuzzle() {
@@ -243,10 +273,11 @@ export default function Home() {
         <div className="search-box">
           <span className="search-icon">⌕</span>
           <label className="sr-only" htmlFor="keyword">찾고 싶은 그림</label>
-          <input id="keyword" value={keyword} onChange={(e) => setKeyword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && recommend()} placeholder="예: 노을 진 바다, 귀여운 고양이, 서울 야경" />
-          <button onClick={recommend}>그림 찾기 <span>→</span></button>
+          <input id="keyword" value={keyword} onChange={(e) => setKeyword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && void recommend()} placeholder="예: 노을 진 바다, 귀여운 고양이, 서울 야경" />
+          <button onClick={() => void recommend()} disabled={searching}>{searching ? '찾는 중...' : '그림 찾기'} <span>→</span></button>
         </div>
-        <div className="quick-tags"><span>이런 건 어때요?</span>{['바다', '고양이', '도시 야경', '케이크'].map(tag => <button key={tag} onClick={() => { setKeyword(tag); const next = findPhotos(tag); setPhotos(next); setSelectedPhoto(next[0]); setSearched(tag); }}>#{tag}</button>)}</div>
+        <div className="quick-tags"><span>이런 건 어때요?</span>{['바다', '고양이', '도시 야경', '케이크'].map(tag => <button key={tag} disabled={searching} onClick={() => { setKeyword(tag); void recommend(tag); }}>#{tag}</button>)}</div>
+        {searchMessage && <p className="search-message" role="status" aria-live="polite">{searchMessage}</p>}
       </section>
 
       <section className="workspace" id="make" aria-labelledby="recommend-title">
@@ -256,11 +287,14 @@ export default function Home() {
         </div>
         <div className="photo-grid">
           {photos.map((photo) => (
-            <button className={`photo-card ${selectedPhoto.id === photo.id ? 'selected' : ''}`} key={photo.id} onClick={() => setSelectedPhoto(photo)} aria-pressed={selectedPhoto.id === photo.id}>
-              <Image src={photo.url} alt={photo.label} fill sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 25vw" />
-              <span className="photo-overlay"><b>{photo.label}</b><small>{photo.credit}</small></span>
-              {selectedPhoto.id === photo.id && <span className="check">✓</span>}
-            </button>
+            <div className="photo-result" key={photo.id}>
+              <button className={`photo-card ${selectedPhoto.id === photo.id ? 'selected' : ''}`} onClick={() => setSelectedPhoto(photo)} aria-pressed={selectedPhoto.id === photo.id}>
+                <Image src={photo.url} alt={photo.label} fill sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 25vw" />
+                <span className="photo-overlay"><b>{photo.label}</b></span>
+                {selectedPhoto.id === photo.id && <span className="check">✓</span>}
+              </button>
+              {photo.sourceUrl ? <a className="photo-source" href={photo.sourceUrl} target="_blank" rel="noreferrer">{photo.credit}</a> : <span className="photo-source">{photo.credit}</span>}
+            </div>
           ))}
         </div>
 
@@ -378,7 +412,7 @@ export default function Home() {
           <div><span>VERSION 1</span><h3>정사각형 교환은 이미지 흐름에 집중합니다</h3><p>조각 두 개를 선택해 위치를 바꾸는 방식입니다. 모양이 모두 같기 때문에 색의 연결, 선의 방향, 사물의 위치가 가장 중요한 단서가 됩니다.</p></div>
           <div><span>VERSION 2</span><h3>직소 끼우기는 실루엣까지 살펴봅니다</h3><p>각기 다른 굴곡을 가진 조각을 같은 모양의 빈 홈에 놓습니다. 오른쪽 조각함에서 색과 윤곽을 함께 비교하며 원래 자리를 찾습니다.</p></div>
         </div>
-        <div className="home-faq"><div><span>QUICK FAQ</span><h2>퍼즐리 이용 전 알아두세요</h2></div><div className="faq-list"><details><summary>회원가입이나 설치가 필요한가요?</summary><p>아니요. 웹 브라우저에서 바로 무료로 시작할 수 있으며 별도 계정을 만들 필요가 없습니다.</p></details><details><summary>검색어와 퍼즐 진행 내용이 저장되나요?</summary><p>현재 검색어와 진행 상태는 브라우저 화면 안에서 처리되며 퍼즐리 서버의 사용자 계정이나 데이터베이스에 저장하지 않습니다.</p></details><details><summary>모바일에서도 이용할 수 있나요?</summary><p>가능합니다. 다만 작은 화면에서 200~400피스는 조작이 세밀해질 수 있으므로 낮은 조각 수부터 시작하는 것을 권합니다.</p></details></div></div>
+        <div className="home-faq"><div><span>QUICK FAQ</span><h2>퍼즐리 이용 전 알아두세요</h2></div><div className="faq-list"><details><summary>회원가입이나 설치가 필요한가요?</summary><p>아니요. 웹 브라우저에서 바로 무료로 시작할 수 있으며 별도 계정을 만들 필요가 없습니다.</p></details><details><summary>검색어와 퍼즐 진행 내용이 저장되나요?</summary><p>검색어는 이미지 추천을 위해 퍼즐리 서버를 거쳐 Pexels에 전달되지만 사용자 계정이나 데이터베이스에는 저장하지 않습니다. 퍼즐 진행 상태는 브라우저 화면 안에서만 처리됩니다.</p></details><details><summary>모바일에서도 이용할 수 있나요?</summary><p>가능합니다. 다만 작은 화면에서 200~400피스는 조작이 세밀해질 수 있으므로 낮은 조각 수부터 시작하는 것을 권합니다.</p></details></div></div>
         <div className="content-links"><a href="/guide">자세한 퍼즐 가이드 읽기 →</a><a href="/about">퍼즐리 운영 원칙 보기 →</a></div>
       </section>
 
