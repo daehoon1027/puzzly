@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useMemo, useState } from 'react';
 import { SiteHeader } from './components/site-header';
 import { SiteFooter } from './components/site-footer';
@@ -42,20 +43,20 @@ const photoSets: Record<string, Photo[]> = {
 
 const difficulties = [12, 20, 30, 48, 80, 120, 200, 400];
 
+const curatedPhotos = Object.values(photoSets).flat();
+
 function findPhotos(keyword: string) {
   const word = keyword.trim().toLowerCase();
-  if (/바다|해변|여름|파도|ocean|sea|beach/.test(word)) return photoSets.ocean;
-  if (/동물|고양|강아|여우|코끼|animal|cat|dog/.test(word)) return photoSets.animal;
-  if (/도시|서울|야경|건물|city|street|night/.test(word)) return photoSets.city;
-  if (/음식|요리|케이크|피자|food|cake|pizza/.test(word)) return photoSets.food;
-  if (/산|숲|자연|알프스|꽃|봄|가을|nature|forest|mountain/.test(word) || !word) return photoSets.nature;
-  const query = encodeURIComponent(word);
-  return Array.from({ length: 4 }, (_, index) => ({
-    id: `search-${word}-${index}`,
-    url: `https://loremflickr.com/1200/900/${query}?lock=${index + 31}`,
-    label: `${keyword.trim()} 추천 ${index + 1}`,
-    credit: 'Flickr',
-  }));
+  if (/바다|해변|여름|파도|섬|휴가|ocean|sea|beach/.test(word)) return photoSets.ocean;
+  if (/동물|고양|강아|여우|코끼|새|말|사자|animal|cat|dog/.test(word)) return photoSets.animal;
+  if (/도시|서울|야경|건물|거리|자동차|건축|city|street|night/.test(word)) return photoSets.city;
+  if (/음식|요리|케이크|피자|커피|디저트|food|cake|pizza/.test(word)) return photoSets.food;
+  if (/산|숲|자연|알프스|꽃|정원|봄|가을|nature|forest|mountain/.test(word) || !word) return photoSets.nature;
+
+  let seed = 0;
+  for (const character of word) seed = (seed * 31 + character.charCodeAt(0)) >>> 0;
+  const start = seed % curatedPhotos.length;
+  return Array.from({ length: 4 }, (_, index) => curatedPhotos[(start + index * 3) % curatedPhotos.length]);
 }
 
 function shuffled(count: number) {
@@ -256,7 +257,7 @@ export default function Home() {
         <div className="photo-grid">
           {photos.map((photo) => (
             <button className={`photo-card ${selectedPhoto.id === photo.id ? 'selected' : ''}`} key={photo.id} onClick={() => setSelectedPhoto(photo)} aria-pressed={selectedPhoto.id === photo.id}>
-              <img src={photo.url} alt={photo.label} />
+              <Image src={photo.url} alt={photo.label} fill sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 25vw" />
               <span className="photo-overlay"><b>{photo.label}</b><small>{photo.credit}</small></span>
               {selectedPhoto.id === photo.id && <span className="check">✓</span>}
             </button>
@@ -307,7 +308,7 @@ export default function Home() {
                 return <button key={index} aria-label={`${index + 1}번 자리의 퍼즐 조각`} className={`puzzle-piece ${picked === index ? 'picked' : ''}`} onClick={() => selectPiece(index)} style={{ backgroundImage: `url(${selectedPhoto.url})`, backgroundSize: `${gridColumns * 100}% ${gridRows * 100}%`, backgroundPosition: `${gridColumns === 1 ? 0 : (col / (gridColumns - 1)) * 100}% ${gridRows === 1 ? 0 : (row / (gridRows - 1)) * 100}%` }} />;
               })}
             </div>
-            {showReference && <div className="reference"><img src={selectedPhoto.url} alt={`원본: ${selectedPhoto.label}`} /><span>원본</span></div>}
+            {showReference && <div className="reference"><Image src={selectedPhoto.url} alt={`원본: ${selectedPhoto.label}`} width={180} height={135} sizes="180px" /><span>원본</span></div>}
           </div>
           <aside className="game-info">
             <div className="stat"><span>진행률</span><b>{progress}%</b><div><i style={{ width: `${progress}%` }} /></div></div>
@@ -339,7 +340,7 @@ export default function Home() {
                 </button>;
               })}
             </div>
-            {showReference && <div className="reference"><img src={selectedPhoto.url} alt={`원본: ${selectedPhoto.label}`} /><span>원본</span></div>}
+            {showReference && <div className="reference"><Image src={selectedPhoto.url} alt={`원본: ${selectedPhoto.label}`} width={180} height={135} sizes="180px" /><span>원본</span></div>}
           </div>
 
           <aside className="piece-tray">
