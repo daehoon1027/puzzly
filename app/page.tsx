@@ -168,6 +168,7 @@ export default function Home() {
   const [pieceCount, setPieceCount] = useState(20);
   const [mode, setMode] = useState<PuzzleMode>('classic');
   const [pieces, setPieces] = useState<number[] | null>(null);
+  const [trayPieces, setTrayPieces] = useState<number[]>([]);
   const [picked, setPicked] = useState<number | null>(null);
   const [placed, setPlaced] = useState<number[]>([]);
   const [selectedTrayPiece, setSelectedTrayPiece] = useState<number | null>(null);
@@ -191,7 +192,9 @@ export default function Home() {
   }
 
   function startPuzzle() {
-    setPieces(shuffled(pieceCount));
+    const nextPieces = shuffled(pieceCount);
+    setPieces(nextPieces);
+    setTrayPieces(nextPieces);
     setPicked(null);
     setPlaced([]);
     setSelectedTrayPiece(null);
@@ -223,6 +226,7 @@ export default function Home() {
     }
     const nextPlaced = [...placed, piece];
     setPlaced(nextPlaced);
+    setTrayPieces((current) => current.filter((item) => item !== piece));
     setSelectedTrayPiece(null);
     setCompleted(nextPlaced.length === pieceCount);
   }
@@ -339,10 +343,10 @@ export default function Home() {
           </div>
 
           <aside className="piece-tray">
-            <div className="tray-heading"><div><span>조각함</span><b>{pieceCount - placed.length}개 남음</b></div><small>끌어서 왼쪽 홈에 놓으세요</small></div>
+            <div className="tray-heading"><div><span>조각함</span><b aria-live="polite">{trayPieces.length}개 남음</b></div><small>끌어서 왼쪽 홈에 놓으세요</small></div>
             <div className="tray-progress"><i style={{ width: `${progress}%` }}/><span>{progress}%</span></div>
             <div className={`tray-grid tray-${pieceCount}`}>
-              {pieces.filter((piece) => !placed.includes(piece)).map((piece) => (
+              {trayPieces.map((piece) => (
                 <button
                   key={piece}
                   draggable
