@@ -197,3 +197,13 @@ a.photo-source:hover { color:var(--orange); text-decoration:underline; }
 .search-guide b { display:block; margin-bottom:3px; color:#3e3932; }
 .search-guide p { margin:2px 0; }
 .search-box button:disabled,.quick-tags button:disabled { cursor:wait; opacity:.65; }
+
+.api-modal-backdrop { position:fixed; inset:0; z-index:1000; display:grid; place-items:center; padding:20px; background:rgba(30,26,21,.58); backdrop-filter:blur(3px); }
+.api-modal { width:min(520px,100%); display:grid; grid-template-columns:auto 1fr; gap:16px; padding:26px; border:1px solid #eadfd2; border-radius:20px; background:#fffdf8; color:#403a33; box-shadow:0 24px 70px rgba(28,22,16,.25); }
+.api-modal-icon { display:grid; place-items:center; width:40px; height:40px; border-radius:50%; background:#fff0e7; color:var(--orange); font-size:22px; font-weight:900; }
+.api-modal-label { margin:0 0 4px; color:var(--orange); font-size:11px; font-weight:800; letter-spacing:.12em; }
+.api-modal h2 { margin:0 0 14px; font-size:24px; line-height:1.25; }
+.api-modal div p { margin:0 0 12px; color:#6f685e; font-size:13px; line-height:1.65; }
+.api-modal div p:first-child { padding:11px 13px; border-radius:10px; background:#f7f2ea; color:#514a42; }
+.api-modal button { border:0; border-radius:10px; background:var(--orange); color:#fff; padding:11px 20px; font-weight:800; }
+@media (max-width:520px) { .api-modal { grid-template-columns:1fr; padding:22px; } }

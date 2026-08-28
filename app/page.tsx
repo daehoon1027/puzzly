@@ -177,6 +177,7 @@ export default function Home() {
   const [selectedPhoto, setSelectedPhoto] = useState<Photo>(defaultPhotos[0]);
   const [searching, setSearching] = useState(false);
   const [searchMessage, setSearchMessage] = useState('');
+  const [fallbackNotice, setFallbackNotice] = useState<string | null>(null);
   const [pieceCount, setPieceCount] = useState(20);
   const [mode, setMode] = useState<PuzzleMode>('classic');
   const [pieces, setPieces] = useState<number[] | null>(null);
@@ -201,6 +202,7 @@ export default function Home() {
     const term = searchKeyword.trim() || '자연';
     setSearching(true);
     setSearchMessage('');
+    setFallbackNotice(null);
     try {
       const response = await fetch(`/api/photos?q=${encodeURIComponent(term)}`);
       const data = (await response.json()) as { photos?: Photo[]; error?: string };
@@ -211,16 +213,20 @@ export default function Home() {
         }
         throw new Error(data.error ?? 'search failed');
       }
-      if (!data.photos || data.photos.length < 10) throw new Error('not enough photos');
+      if (!data.photos || data.photos.length < 10) throw new Error('검색 결과가 10장보다 적어 추천 목록을 완성하지 못했습니다.');
       setPhotos(data.photos);
       setSelectedPhoto(data.photos[0]);
       setSearched(term);
-    } catch {
+    } catch (error) {
       const fallback = findPhotos(term);
+      const reason = error instanceof Error && error.message !== 'search failed'
+        ? error.message
+        : '네트워크 문제로 Pexels 이미지 서비스에 연결할 수 없었습니다.';
       setPhotos(fallback);
       setSelectedPhoto(fallback[0]);
       setSearched(term);
-      setSearchMessage('실시간 검색이 원활하지 않아 선별 이미지를 보여드려요.');
+      setSearchMessage('실시간 검색 대신 선별한 대체 이미지 10장을 보여드려요.');
+      setFallbackNotice(reason);
     } finally {
       setSearching(false);
     }
@@ -424,6 +430,21 @@ export default function Home() {
         <div className="home-faq"><div><span>QUICK FAQ</span><h2>퍼즐리 이용 전 알아두세요</h2></div><div className="faq-list"><details><summary>회원가입이나 설치가 필요한가요?</summary><p>아니요. 웹 브라우저에서 바로 무료로 시작할 수 있으며 별도 계정을 만들 필요가 없습니다.</p></details><details><summary>검색어와 퍼즐 진행 내용이 저장되나요?</summary><p>검색어는 이미지 추천을 위해 퍼즐리 서버를 거쳐 Pexels에 전달되지만 사용자 계정이나 데이터베이스에는 저장하지 않습니다. 퍼즐 진행 상태는 브라우저 화면 안에서만 처리됩니다.</p></details><details><summary>모바일에서도 이용할 수 있나요?</summary><p>가능합니다. 다만 작은 화면에서 200~400피스는 조작이 세밀해질 수 있으므로 낮은 조각 수부터 시작하는 것을 권합니다.</p></details></div></div>
         <div className="content-links"><a href="/guide">자세한 퍼즐 가이드 읽기 →</a><a href="/about">퍼즐리 운영 원칙 보기 →</a></div>
       </section>
+
+      {fallbackNotice && <div className="api-modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setFallbackNotice(null); }}>
+        <section className="api-modal" role="alertdialog" aria-modal="true" aria-labelledby="api-modal-title" aria-describedby="api-modal-description">
+          <span className="api-modal-icon" aria-hidden="true">!</span>
+          <div>
+            <p className="api-modal-label">이미지 검색 안내</p>
+            <h2 id="api-modal-title">대체 이미지를 제공했습니다</h2>
+            <div id="api-modal-description">
+              <p><b>API 오류 원인</b><br/>{fallbackNotice}</p>
+              <p>Pexels 실시간 검색을 완료하지 못해 퍼즐리가 미리 선별한 Unsplash 이미지 10장을 대신 보여드립니다. 원하는 이미지를 선택해 퍼즐을 계속 이용할 수 있습니다.</p>
+            </div>
+            <button autoFocus onClick={() => setFallbackNotice(null)}>확인</button>
+          </div>
+        </section>
+      </div>}
 
       <SiteFooter />
     </main>

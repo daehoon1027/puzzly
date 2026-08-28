@@ -55,7 +55,13 @@ export async function GET(request: NextRequest) {
     });
     if (!response.ok) {
       console.error('Pexels search failed', response.status);
-      return NextResponse.json({ error: '이미지 검색이 잠시 원활하지 않아요.' }, { status: 502 });
+      if (response.status === 429) {
+        return NextResponse.json({ error: 'Pexels 무료 API의 요청 한도가 일시적으로 소진되었습니다.' }, { status: 429 });
+      }
+      if (response.status === 401 || response.status === 403) {
+        return NextResponse.json({ error: 'Pexels API 인증 설정을 확인할 수 없습니다.' }, { status: 503 });
+      }
+      return NextResponse.json({ error: 'Pexels 이미지 서비스가 일시적으로 응답하지 않았습니다.' }, { status: 502 });
     }
 
     const data = (await response.json()) as { photos?: PexelsPhoto[] };
@@ -80,6 +86,6 @@ export async function GET(request: NextRequest) {
     );
   } catch (error) {
     console.error('Pexels search error', error instanceof Error ? error.message : 'unknown error');
-    return NextResponse.json({ error: '이미지 검색이 잠시 원활하지 않아요.' }, { status: 502 });
+    return NextResponse.json({ error: 'Pexels 이미지 서비스에 연결할 수 없었습니다.' }, { status: 502 });
   }
 }
