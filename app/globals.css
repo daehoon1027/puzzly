@@ -198,6 +198,12 @@ a.photo-source:hover { color:var(--orange); text-decoration:underline; }
 .search-guide p { margin:2px 0; }
 .search-box button:disabled,.quick-tags button:disabled { cursor:wait; opacity:.65; }
 
+.kakao-ad-section { width:100%; min-height:154px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:22px 16px 30px; border-top:1px solid #e8e2d8; background:#faf8f2; }
+.ad-label { color:#8b8479; font-size:10px; line-height:1; letter-spacing:.08em; }
+.kakao-ad-frame { width:320px; min-height:100px; display:grid; place-items:center; overflow:hidden; background:#f2eee6; }
+.kakao-ad-frame .kakao_ad_area { width:320px!important; height:100px!important; }
+
+
 .api-modal-backdrop { position:fixed; inset:0; z-index:1000; display:grid; place-items:center; padding:20px; background:rgba(30,26,21,.58); backdrop-filter:blur(3px); }
 .api-modal { width:min(520px,100%); display:grid; grid-template-columns:auto 1fr; gap:16px; padding:26px; border:1px solid #eadfd2; border-radius:20px; background:#fffdf8; color:#403a33; box-shadow:0 24px 70px rgba(28,22,16,.25); }
 .api-modal-icon { display:grid; place-items:center; width:40px; height:40px; border-radius:50%; background:#fff0e7; color:var(--orange); font-size:22px; font-weight:900; }

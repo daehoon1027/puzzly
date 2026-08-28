@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useMemo, useState } from 'react';
 import { SiteHeader } from './components/site-header';
 import { SiteFooter } from './components/site-footer';
+import { KakaoAd } from './components/kakao-ad';
 
 type Photo = { id: string; url: string; label: string; credit: string; sourceUrl?: string; photographerUrl?: string };
 type PuzzleMode = 'classic' | 'shape';
@@ -430,6 +431,8 @@ export default function Home() {
         <div className="home-faq"><div><span>QUICK FAQ</span><h2>퍼즐리 이용 전 알아두세요</h2></div><div className="faq-list"><details><summary>회원가입이나 설치가 필요한가요?</summary><p>아니요. 웹 브라우저에서 바로 무료로 시작할 수 있으며 별도 계정을 만들 필요가 없습니다.</p></details><details><summary>검색어와 퍼즐 진행 내용이 저장되나요?</summary><p>검색어는 이미지 추천을 위해 퍼즐리 서버를 거쳐 Pexels에 전달되지만 사용자 계정이나 데이터베이스에는 저장하지 않습니다. 퍼즐 진행 상태는 브라우저 화면 안에서만 처리됩니다.</p></details><details><summary>모바일에서도 이용할 수 있나요?</summary><p>가능합니다. 다만 작은 화면에서 200~400피스는 조작이 세밀해질 수 있으므로 낮은 조각 수부터 시작하는 것을 권합니다.</p></details></div></div>
         <div className="content-links"><a href="/guide">자세한 퍼즐 가이드 읽기 →</a><a href="/about">퍼즐리 운영 원칙 보기 →</a></div>
       </section>
+
+      <KakaoAd />
 
       {fallbackNotice && <div className="api-modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setFallbackNotice(null); }}>
         <section className="api-modal" role="alertdialog" aria-modal="true" aria-labelledby="api-modal-title" aria-describedby="api-modal-description">
