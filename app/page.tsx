@@ -172,7 +172,7 @@ function JigsawPiece({ piece, rows, columns, imageUrl, showImage, variant, class
 export default function Home() {
   const [keyword, setKeyword] = useState('알프스의 봄');
   const [searched, setSearched] = useState('알프스의 봄');
-  const defaultPhotos = useMemo(() => withUnsplashCredit(photoSets.nature), []);
+  const defaultPhotos = useMemo(() => findPhotos('nature'), []);
   const [photos, setPhotos] = useState<Photo[]>(defaultPhotos);
   const [selectedPhoto, setSelectedPhoto] = useState<Photo>(defaultPhotos[0]);
   const [searching, setSearching] = useState(false);
