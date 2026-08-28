@@ -169,8 +169,8 @@ export default function Home() {
   const [keyword, setKeyword] = useState('알프스의 봄');
   const [searched, setSearched] = useState('알프스의 봄');
   const defaultPhotos = useMemo(() => withUnsplashCredit(photoSets.nature), []);
-  const [photos, setPhotos] = useState(defaultPhotos);
-  const [selectedPhoto, setSelectedPhoto] = useState(defaultPhotos[0]);
+  const [photos, setPhotos] = useState<Photo[]>(defaultPhotos);
+  const [selectedPhoto, setSelectedPhoto] = useState<Photo>(defaultPhotos[0]);
   const [searching, setSearching] = useState(false);
   const [searchMessage, setSearchMessage] = useState('');
   const [pieceCount, setPieceCount] = useState(20);
