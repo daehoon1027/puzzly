@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   category: 'games',
   creator: '퍼즐리 운영팀',
   publisher: '퍼즐리',
+  verification: { google: 'yTLrFM2hXncQubi1SsP-xC26mOqABnXJAimyqo2u_3c' },
   alternates: { canonical: '/' },
   robots: {
     index: true,
