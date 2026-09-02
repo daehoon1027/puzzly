@@ -1,13 +1,15 @@
 'use client';
 
 import Image from 'next/image';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { SiteHeader } from './components/site-header';
 import { SiteFooter } from './components/site-footer';
 import { KakaoAd } from './components/kakao-ad';
 
 type Photo = { id: string; url: string; label: string; credit: string; sourceUrl?: string; photographerUrl?: string };
 type PuzzleMode = 'classic' | 'shape';
+
+const INITIAL_QUERY = '알프스의 봄';
 
 const photoSets: Record<string, Photo[]> = {
   nature: [
@@ -44,17 +46,12 @@ const photoSets: Record<string, Photo[]> = {
 
 const difficulties = [12, 20, 30, 48, 80, 120, 200, 400];
 
-const curatedPhotos = Object.values(photoSets).flat();
-
 function withUnsplashCredit(photos: Photo[]) {
   return photos.map((photo) => ({ ...photo, credit: 'Photo from Unsplash', sourceUrl: 'https://unsplash.com' }));
 }
 
 function findPhotos(keyword: string) {
   const word = keyword.trim().toLowerCase();
-  let seed = 0;
-  for (const character of word) seed = (seed * 31 + character.charCodeAt(0)) >>> 0;
-
   let preferred: Photo[] = [];
   if (/바다|해변|여름|파도|섬|휴가|ocean|sea|beach/.test(word)) preferred = photoSets.ocean;
   else if (/동물|고양|강아|여우|코끼|새|말|사자|animal|cat|dog/.test(word)) preferred = photoSets.animal;
@@ -62,10 +59,24 @@ function findPhotos(keyword: string) {
   else if (/음식|요리|케이크|피자|커피|디저트|food|cake|pizza/.test(word)) preferred = photoSets.food;
   else if (/산|숲|자연|알프스|꽃|정원|봄|가을|nature|forest|mountain/.test(word) || !word) preferred = photoSets.nature;
 
-  const remaining = curatedPhotos.filter((photo) => !preferred.some((item) => item.id === photo.id));
-  const start = remaining.length ? seed % remaining.length : 0;
-  const rotated = [...remaining.slice(start), ...remaining.slice(0, start)];
-  return withUnsplashCredit([...preferred, ...rotated].slice(0, 10));
+  return withUnsplashCredit(preferred);
+}
+
+class PhotoSearchError extends Error {
+  constructor(message: string, readonly status: number) {
+    super(message);
+    this.name = 'PhotoSearchError';
+  }
+}
+
+async function fetchRecommendedPhotos(term: string, signal?: AbortSignal) {
+  const response = await fetch(`/api/photos?q=${encodeURIComponent(term)}`, { signal });
+  const data = (await response.json()) as { photos?: Photo[]; error?: string };
+  if (!response.ok) throw new PhotoSearchError(data.error ?? '이미지 검색에 실패했습니다.', response.status);
+  if (!data.photos || data.photos.length < 10) {
+    throw new PhotoSearchError('검색 결과가 10장보다 적어 추천 목록을 완성하지 못했습니다.', 502);
+  }
+  return data.photos;
 }
 
 function shuffled(count: number) {
@@ -171,12 +182,13 @@ function JigsawPiece({ piece, rows, columns, imageUrl, showImage, variant, class
 }
 
 export default function Home() {
-  const [keyword, setKeyword] = useState('알프스의 봄');
-  const [searched, setSearched] = useState('알프스의 봄');
-  const defaultPhotos = useMemo(() => findPhotos('nature'), []);
-  const [photos, setPhotos] = useState<Photo[]>(defaultPhotos);
-  const [selectedPhoto, setSelectedPhoto] = useState<Photo>(defaultPhotos[0]);
+  const [keyword, setKeyword] = useState(INITIAL_QUERY);
+  const [searched, setSearched] = useState(INITIAL_QUERY);
+  const [photos, setPhotos] = useState<Photo[]>(() => findPhotos(INITIAL_QUERY));
+  const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(() => findPhotos(INITIAL_QUERY)[0] ?? null);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [searching, setSearching] = useState(false);
+  const [loadingQuery, setLoadingQuery] = useState<string | null>(INITIAL_QUERY);
   const [searchMessage, setSearchMessage] = useState('');
   const [fallbackNotice, setFallbackNotice] = useState<string | null>(null);
   const [pieceCount, setPieceCount] = useState(20);
@@ -190,6 +202,8 @@ export default function Home() {
   const [moves, setMoves] = useState(0);
   const [completed, setCompleted] = useState(false);
   const [showReference, setShowReference] = useState(false);
+  const busy = initialLoading || searching;
+  const displayedQuery = loadingQuery ?? searched;
 
   const { rows: gridRows, columns: gridColumns } = gridDimensions(pieceCount);
   const progress = useMemo(() => {
@@ -198,42 +212,75 @@ export default function Home() {
     return Math.round((pieces.filter((piece, index) => piece === index).length / pieces.length) * 100);
   }, [mode, pieces, placed.length]);
 
+  useEffect(() => {
+    let active = true;
+    const controller = new AbortController();
+
+    async function loadInitialPhotos() {
+      try {
+        const initialPhotos = await fetchRecommendedPhotos(INITIAL_QUERY, controller.signal);
+        if (!active) return;
+        setPhotos(initialPhotos);
+        setSelectedPhoto(initialPhotos[0]);
+      } catch (error) {
+        if (!active || (error instanceof Error && error.name === 'AbortError')) return;
+        const fallback = findPhotos(INITIAL_QUERY);
+        const reason = error instanceof Error ? error.message : 'Pexels 이미지 서비스에 연결할 수 없었습니다.';
+        setPhotos(fallback);
+        setSelectedPhoto(fallback[0] ?? null);
+        setSearchMessage(fallback.length
+          ? `실시간 검색 대신 관련 대체 이미지 ${fallback.length}장을 보여드려요.`
+          : '실시간 검색을 완료하지 못했고 관련 대체 이미지도 찾지 못했어요.');
+        setFallbackNotice(reason);
+      } finally {
+        if (active) {
+          setInitialLoading(false);
+          setLoadingQuery(null);
+        }
+      }
+    }
+
+    void loadInitialPhotos();
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, []);
+
   async function recommend(searchKeyword = keyword) {
-    if (searching) return;
+    if (busy) return;
     const term = searchKeyword.trim() || '자연';
     setSearching(true);
+    setLoadingQuery(term);
     setSearchMessage('');
     setFallbackNotice(null);
     try {
-      const response = await fetch(`/api/photos?q=${encodeURIComponent(term)}`);
-      const data = (await response.json()) as { photos?: Photo[]; error?: string };
-      if (!response.ok) {
-        if (response.status === 400) {
-          setSearchMessage(data.error ?? '검색어를 다시 확인해 주세요.');
-          return;
-        }
-        throw new Error(data.error ?? 'search failed');
-      }
-      if (!data.photos || data.photos.length < 10) throw new Error('검색 결과가 10장보다 적어 추천 목록을 완성하지 못했습니다.');
-      setPhotos(data.photos);
-      setSelectedPhoto(data.photos[0]);
+      const recommendedPhotos = await fetchRecommendedPhotos(term);
+      setPhotos(recommendedPhotos);
+      setSelectedPhoto(recommendedPhotos[0]);
       setSearched(term);
     } catch (error) {
+      if (error instanceof PhotoSearchError && error.status === 400) {
+        setSearchMessage(error.message);
+        return;
+      }
       const fallback = findPhotos(term);
-      const reason = error instanceof Error && error.message !== 'search failed'
-        ? error.message
-        : '네트워크 문제로 Pexels 이미지 서비스에 연결할 수 없었습니다.';
+      const reason = error instanceof Error ? error.message : '네트워크 문제로 Pexels 이미지 서비스에 연결할 수 없었습니다.';
       setPhotos(fallback);
-      setSelectedPhoto(fallback[0]);
+      setSelectedPhoto(fallback[0] ?? null);
       setSearched(term);
-      setSearchMessage('실시간 검색 대신 선별한 대체 이미지 10장을 보여드려요.');
+      setSearchMessage(fallback.length
+        ? `실시간 검색 대신 관련 대체 이미지 ${fallback.length}장을 보여드려요.`
+        : '실시간 검색을 완료하지 못했고 관련 대체 이미지도 찾지 못했어요.');
       setFallbackNotice(reason);
     } finally {
       setSearching(false);
+      setLoadingQuery(null);
     }
   }
 
   function startPuzzle() {
+    if (!selectedPhoto) return;
     const nextPieces = shuffled(pieceCount);
     setPieces(nextPieces);
     setTrayPieces(nextPieces);
@@ -285,9 +332,9 @@ export default function Home() {
           <span className="search-icon">⌕</span>
           <label className="sr-only" htmlFor="keyword">찾고 싶은 그림</label>
           <input id="keyword" value={keyword} onChange={(e) => setKeyword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && void recommend()} placeholder="예: 노을 진 바다, 귀여운 고양이, 서울 야경" />
-          <button onClick={() => void recommend()} disabled={searching}>{searching ? '찾는 중...' : '그림 찾기'} <span>→</span></button>
+          <button onClick={() => void recommend()} disabled={busy}>{busy ? '찾는 중...' : '그림 찾기'} <span>→</span></button>
         </div>
-        <div className="quick-tags"><span>이런 건 어때요?</span>{['바다', '고양이', '도시 야경', '케이크'].map(tag => <button key={tag} disabled={searching} onClick={() => { setKeyword(tag); void recommend(tag); }}>#{tag}</button>)}</div>
+        <div className="quick-tags"><span>이런 건 어때요?</span>{['바다', '고양이', '도시 야경', '케이크'].map(tag => <button key={tag} disabled={busy} onClick={() => { setKeyword(tag); void recommend(tag); }}>#{tag}</button>)}</div>
         <div className="search-guide">
           <b>검색어 안내</b>
           <p>사물·장소·분위기나 인물의 특징과 상황을 구체적으로 적으면 더 잘 찾을 수 있어요. 예: ‘웃는 가족’, ‘빨간 우산을 든 사람’.</p>
@@ -298,21 +345,27 @@ export default function Home() {
 
       <section className="workspace" id="make" aria-labelledby="recommend-title">
         <div className="section-heading">
-          <div><span className="step">01</span><h2 id="recommend-title">‘{searched}’ 추천 그림</h2><p>퍼즐로 만들고 싶은 그림을 골라주세요.</p></div>
-          <span className="result-count">{photos.length}개의 그림</span>
+          <div><span className="step">01</span><h2 id="recommend-title">‘{displayedQuery}’ 추천 그림</h2><p>{busy ? '어울리는 그림을 찾고 있어요.' : '퍼즐로 만들고 싶은 그림을 골라주세요.'}</p></div>
+          <span className="result-count" role="status" aria-live="polite">{busy ? '찾는 중...' : `${photos.length}개의 그림`}</span>
         </div>
-        <div className="photo-grid">
-          {photos.map((photo) => (
+        <div className="photo-grid" aria-busy={busy}>
+          {busy ? Array.from({ length: 10 }, (_, index) => (
+            <div className="photo-result photo-skeleton" key={`skeleton-${index}`} aria-hidden="true">
+              <div className="photo-skeleton-card" />
+              <div className="photo-skeleton-line" />
+            </div>
+          )) : photos.map((photo) => (
             <div className="photo-result" key={photo.id}>
-              <button className={`photo-card ${selectedPhoto.id === photo.id ? 'selected' : ''}`} onClick={() => setSelectedPhoto(photo)} aria-pressed={selectedPhoto.id === photo.id}>
+              <button className={`photo-card ${selectedPhoto?.id === photo.id ? 'selected' : ''}`} onClick={() => setSelectedPhoto(photo)} aria-pressed={selectedPhoto?.id === photo.id}>
                 <Image src={photo.url} alt={photo.label} fill sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 25vw" />
                 <span className="photo-overlay"><b>{photo.label}</b></span>
-                {selectedPhoto.id === photo.id && <span className="check">✓</span>}
+                {selectedPhoto?.id === photo.id && <span className="check">✓</span>}
               </button>
               {photo.sourceUrl ? <a className="photo-source" href={photo.sourceUrl} target="_blank" rel="noreferrer">{photo.credit}</a> : <span className="photo-source">{photo.credit}</span>}
             </div>
           ))}
         </div>
+        {!busy && photos.length === 0 && <div className="photo-empty" role="status"><b>관련 이미지를 표시하지 않았어요.</b><span>잠시 후 다시 검색하거나 다른 검색어를 입력해 주세요.</span></div>}
 
         <div className="mode-section">
           <div className="setup-copy"><span className="step">02</span><h2>어떤 방식으로 맞출까요?</h2><p>정사각형을 바꾸거나, 자유로운 모양을 빈자리에 끼워보세요.</p></div>
@@ -335,11 +388,11 @@ export default function Home() {
           <div className="difficulty" role="group" aria-label="퍼즐 조각 수">
             {difficulties.map(count => <button key={count} onClick={() => setPieceCount(count)} className={pieceCount === count ? 'active' : ''}><b>{count}</b><span>피스</span></button>)}
           </div>
-          <button className="start-button" onClick={startPuzzle}>{mode === 'classic' ? '버전 1 시작하기' : '버전 2 시작하기'} <span>→</span></button>
+          <button className="start-button" onClick={startPuzzle} disabled={busy || !selectedPhoto}>{mode === 'classic' ? '버전 1 시작하기' : '버전 2 시작하기'} <span>→</span></button>
         </div>
       </section>
 
-      {pieces && <section className="puzzle-section" id="puzzle">
+      {pieces && selectedPhoto && <section className="puzzle-section" id="puzzle">
         <div className="puzzle-top">
           <div>
             <span className="step light">{mode === 'classic' ? 'VER.1' : 'VER.2'}</span>
@@ -442,7 +495,9 @@ export default function Home() {
             <h2 id="api-modal-title">대체 이미지를 제공했습니다</h2>
             <div id="api-modal-description">
               <p><b>API 오류 원인</b><br/>{fallbackNotice}</p>
-              <p>Pexels 실시간 검색을 완료하지 못해 퍼즐리가 미리 선별한 Unsplash 이미지 10장을 대신 보여드립니다. 원하는 이미지를 선택해 퍼즐을 계속 이용할 수 있습니다.</p>
+              <p>{photos.length
+                ? `Pexels 실시간 검색을 완료하지 못해 검색어와 관련된 Unsplash 이미지 ${photos.length}장을 대신 보여드립니다.`
+                : '관련 없는 이미지를 대신 보여주지 않았습니다. 잠시 후 다시 검색해 주세요.'}</p>
             </div>
             <button autoFocus onClick={() => setFallbackNotice(null)}>확인</button>
           </div>

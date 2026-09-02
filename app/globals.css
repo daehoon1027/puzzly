@@ -36,6 +36,11 @@ button { cursor:pointer; }
 .photo-card.selected { outline-width:4px; outline-offset:3px; }
 .photo-card img { width:100%; height:100%; object-fit:cover; transition:.3s ease; }
 .photo-card:hover img { transform:scale(1.04); }
+.photo-skeleton-card { height:230px; border-radius:18px; background:linear-gradient(100deg,#ddd6ca 20%,#eee8dd 38%,#ddd6ca 56%); background-size:220% 100%; animation:skeleton-shimmer 1.3s ease-in-out infinite; }
+.photo-skeleton-line { width:58%; height:10px; margin:11px 4px 0; border-radius:999px; background:#d9d2c7; }
+.photo-empty { grid-column:1/-1; display:flex; flex-direction:column; align-items:center; gap:7px; padding:48px 20px; border:1px dashed #cfc6b8; border-radius:18px; color:#6f685e; background:rgba(255,255,255,.35); }
+.photo-empty span { font-size:12px; }
+@keyframes skeleton-shimmer { to { background-position-x:-220%; } }
 .photo-overlay { position:absolute; inset:auto 0 0; padding:35px 16px 15px; color:white; background:linear-gradient(transparent,rgba(0,0,0,.72)); display:flex; flex-direction:column; gap:3px; }
 .photo-overlay b { font-size:14px; }.photo-overlay small { opacity:.72; font-size:10px; }
 .check { position:absolute; top:13px; right:13px; width:29px; height:29px; border-radius:50%; display:grid; place-items:center; background:var(--orange); color:white; font-weight:900; border:3px solid white; }
@@ -45,6 +50,7 @@ button { cursor:pointer; }
 .difficulty button { min-width:60px; padding:10px 8px; border:1px solid #d7d0c4; background:#faf8f2; border-radius:11px; color:#777066; display:flex; align-items:baseline; justify-content:center; gap:3px; }
 .difficulty button b { font-size:16px; }.difficulty button span { font-size:10px; }.difficulty button.active { background:var(--green); border-color:var(--green); color:white; box-shadow:0 5px 13px rgba(47,98,79,.22); }
 .start-button { white-space:nowrap; padding:17px 22px; }
+.start-button:disabled { cursor:wait; opacity:.55; }
 .puzzle-section { padding:78px max(24px,calc((100% - 1120px)/2)) 100px; background:#254e40; color:white; scroll-margin-top:20px; }
 .puzzle-top { display:flex; align-items:end; justify-content:space-between; margin-bottom:30px; }.puzzle-top>div:first-child { display:grid; grid-template-columns:auto 1fr; column-gap:13px; }.puzzle-top h2 { font-size:31px; }.puzzle-top p { grid-column:2; color:#b7cbc3; }.step.light { background:#f7c75a; color:#254e40; }
 .puzzle-actions { display:flex; gap:8px; }.puzzle-actions button { border:1px solid rgba(255,255,255,.22); background:rgba(255,255,255,.08); color:white; border-radius:10px; padding:10px 13px; font-size:12px; }
@@ -91,7 +97,7 @@ footer { min-height:150px; padding:40px max(24px,calc((100% - 1120px)/2)); displ
 
 @media (max-width:900px) { .photo-grid { grid-template-columns:repeat(2,1fr); }.mode-section,.setup-card { grid-template-columns:1fr; }.game-layout,.shape-game-layout { grid-template-columns:1fr; }.piece-tray { height:460px; min-height:0; }.game-info { display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px; }.mini-stats { margin:0; border:0; }.tip { align-self:center; } }
 @media (max-width:600px) { .header-note { display:none; }.mode-picker { grid-template-columns:1fr; }.mode-section { gap:24px; }.piece-tray { height:380px; padding:15px; }.hero { padding-top:60px; }.hero h1 { letter-spacing:-2px; }.search-box { flex-wrap:wrap; }.search-icon { display:none; }.search-box input { flex-basis:100%; }.search-box button { width:100%; }.photo-grid { grid-template-columns:1fr; }.photo-card { height:250px; }.section-heading,.puzzle-top { align-items:flex-start; gap:18px; flex-direction:column; }.difficulty { grid-template-columns:repeat(4,1fr); }.game-info { display:block; }.mini-stats { margin:20px 0; border-block:1px solid #ddd6ca; }.reference { width:120px; }.puzzle-board { border-width:4px; border-radius:10px; } footer { grid-template-columns:1fr; gap:16px; text-align:center; } footer .brand { justify-content:center; } footer>span { text-align:center; } }
-@media (prefers-reduced-motion:reduce) { * { scroll-behavior:auto!important; transition:none!important; } }
+@media (prefers-reduced-motion:reduce) { * { scroll-behavior:auto!important; transition:none!important; }.photo-skeleton-card { animation:none; } }
 
 
 /* Publisher content and trust pages */
