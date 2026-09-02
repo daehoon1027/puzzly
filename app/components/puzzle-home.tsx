@@ -256,8 +256,8 @@ export function PuzzleHome({ locale }: { locale: Locale }) {
   const t = uiCopy[locale];
   const initialQuery = t.initialQuery;
   const isEnglish = locale === 'en';
-  const [keyword, setKeyword] = useState(initialQuery);
-  const [searched, setSearched] = useState(initialQuery);
+  const [keyword, setKeyword] = useState<string>(initialQuery);
+  const [searched, setSearched] = useState<string>(initialQuery);
   const [photos, setPhotos] = useState<Photo[]>(() => findPhotos(initialQuery, locale));
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(() => findPhotos(initialQuery, locale)[0] ?? null);
   const [initialLoading, setInitialLoading] = useState(true);
