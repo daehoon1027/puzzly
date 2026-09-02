@@ -72,7 +72,7 @@
 - 매체 URL: `puzzly-one.vercel.app`
 - 카테고리: 게임, 엔터테인먼트
 - 광고 단위명: `퍼즐리 메인 하단 배너`
-- 광고 단위 ID: `DAN-s0iBuwLpaImB4HTt`
+- 광고 단위 ID: `DAN-sOiBuwLpaImB4HTt`
 - 크기: 320×100
 - 구현 파일: `app/components/kakao-ad.tsx`
 - 홈 하단에서 호출함

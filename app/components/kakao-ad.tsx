@@ -2,7 +2,7 @@
 
 import Script from 'next/script';
 
-const KAKAO_AD_UNIT = 'DAN-s0iBuwLpaImB4HTt';
+const KAKAO_AD_UNIT = 'DAN-sOiBuwLpaImB4HTt';
 
 export function KakaoAd() {
   return (
