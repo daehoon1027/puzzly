@@ -14,10 +14,10 @@ export function SiteFooter({ locale }: { locale: 'ko' | 'en' }) {
       </div>
       <nav aria-label={isEnglish ? 'Footer menu' : '하단 메뉴'}>
         <Link href={isEnglish ? '/en#notes' : '/guide'}>{isEnglish ? 'Puzzle guide' : '퍼즐 가이드'}</Link>
-        <Link href="/about">{isEnglish ? 'About' : '서비스 소개'}</Link>
+        <Link href={isEnglish ? '/en/about' : '/about'}>{isEnglish ? 'About' : '서비스 소개'}</Link>
         <Link href="/privacy">{isEnglish ? 'Privacy' : '개인정보처리방침'}</Link>
         <Link href="/terms">{isEnglish ? 'Terms' : '이용약관'}</Link>
-        <Link href="/contact">{isEnglish ? 'Contact' : '문의하기'}</Link>
+        <Link href={isEnglish ? '/en/contact' : '/contact'}>{isEnglish ? 'Contact' : '문의하기'}</Link>
       </nav>
       <span>© 2026 Puzzly. All rights reserved.</span>
     </footer>
