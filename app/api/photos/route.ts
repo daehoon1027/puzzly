@@ -32,21 +32,23 @@ function translateQuery(query: string) {
 
 export async function GET(request: NextRequest) {
   const query = request.nextUrl.searchParams.get('q')?.trim() ?? '';
+  const locale = request.nextUrl.searchParams.get('locale') === 'en' ? 'en' : 'ko';
+  const isEnglish = locale === 'en';
   if (!query || query.length > 60) {
-    return NextResponse.json({ error: '검색어는 1자 이상 60자 이하로 입력해 주세요.' }, { status: 400 });
+    return NextResponse.json({ error: isEnglish ? 'Enter a search term between 1 and 60 characters.' : '검색어는 1자 이상 60자 이하로 입력해 주세요.' }, { status: 400 });
   }
   if (BLOCKED_TERMS.some((term) => query.toLowerCase().includes(term))) {
-    return NextResponse.json({ error: '가족 모두가 즐길 수 있는 검색어를 입력해 주세요.' }, { status: 400 });
+    return NextResponse.json({ error: isEnglish ? 'Please enter a family-friendly search.' : '가족 모두가 즐길 수 있는 검색어를 입력해 주세요.' }, { status: 400 });
   }
 
   const apiKey = process.env.PEXELS_API_KEY;
-  if (!apiKey) return NextResponse.json({ error: '이미지 검색을 준비하고 있어요.' }, { status: 503 });
+  if (!apiKey) return NextResponse.json({ error: isEnglish ? 'Image search is not available yet.' : '이미지 검색을 준비하고 있어요.' }, { status: 503 });
 
   const url = new URL('https://api.pexels.com/v1/search');
   url.searchParams.set('query', translateQuery(query));
   url.searchParams.set('per_page', '20');
   url.searchParams.set('orientation', 'landscape');
-  url.searchParams.set('locale', 'ko-KR');
+  url.searchParams.set('locale', isEnglish ? 'en-US' : 'ko-KR');
 
   try {
     const response = await fetch(url, {
@@ -56,12 +58,12 @@ export async function GET(request: NextRequest) {
     if (!response.ok) {
       console.error('Pexels search failed', response.status);
       if (response.status === 429) {
-        return NextResponse.json({ error: 'Pexels 무료 API의 요청 한도가 일시적으로 소진되었습니다.' }, { status: 429 });
+        return NextResponse.json({ error: isEnglish ? 'The free Pexels API limit has been reached temporarily.' : 'Pexels 무료 API의 요청 한도가 일시적으로 소진되었습니다.' }, { status: 429 });
       }
       if (response.status === 401 || response.status === 403) {
-        return NextResponse.json({ error: 'Pexels API 인증 설정을 확인할 수 없습니다.' }, { status: 503 });
+        return NextResponse.json({ error: isEnglish ? 'The Pexels API configuration could not be verified.' : 'Pexels API 인증 설정을 확인할 수 없습니다.' }, { status: 503 });
       }
-      return NextResponse.json({ error: 'Pexels 이미지 서비스가 일시적으로 응답하지 않았습니다.' }, { status: 502 });
+      return NextResponse.json({ error: isEnglish ? 'The Pexels image service is temporarily unavailable.' : 'Pexels 이미지 서비스가 일시적으로 응답하지 않았습니다.' }, { status: 502 });
     }
 
     const data = (await response.json()) as { photos?: PexelsPhoto[] };
@@ -71,14 +73,14 @@ export async function GET(request: NextRequest) {
       .map((photo) => ({
         id: `pexels-${photo.id}`,
         url: photo.src.large ?? photo.src.landscape!,
-        label: photo.alt?.trim() || `${query} 이미지`,
+        label: photo.alt?.trim() || (isEnglish ? `${query} image` : `${query} 이미지`),
         credit: `Photo by ${photo.photographer} on Pexels`,
         sourceUrl: photo.url,
         photographerUrl: photo.photographer_url,
       }));
 
     if (photos.length < 10) {
-      return NextResponse.json({ error: '조건에 맞는 이미지를 충분히 찾지 못했어요.' }, { status: 404 });
+      return NextResponse.json({ error: isEnglish ? 'Not enough suitable images were found.' : '조건에 맞는 이미지를 충분히 찾지 못했어요.' }, { status: 404 });
     }
     return NextResponse.json(
       { photos },
@@ -86,6 +88,6 @@ export async function GET(request: NextRequest) {
     );
   } catch (error) {
     console.error('Pexels search error', error instanceof Error ? error.message : 'unknown error');
-    return NextResponse.json({ error: 'Pexels 이미지 서비스에 연결할 수 없었습니다.' }, { status: 502 });
+    return NextResponse.json({ error: isEnglish ? 'Could not connect to the Pexels image service.' : 'Pexels 이미지 서비스에 연결할 수 없었습니다.' }, { status: 502 });
   }
 }

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     google: 'yTLrFM2hXncQubi1SsP-xC26mOqABnXJAimyqo2u_3c',
     other: { 'naver-site-verification': 'c6c5317e6fed3e54410dfbfc6ac44cf53ba58f28' },
   },
-  alternates: { canonical: '/' },
+  alternates: { canonical: '/', languages: { 'ko-KR': '/', 'en-US': '/en' } },
   robots: {
     index: true,
     follow: true,
