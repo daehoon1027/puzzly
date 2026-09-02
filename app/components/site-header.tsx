@@ -1,7 +1,10 @@
 import Link from 'next/link';
 
-export function SiteHeader({ locale }: { locale: 'ko' | 'en' }) {
+export function SiteHeader({ locale, path }: { locale: 'ko' | 'en'; path?: string }) {
   const isEnglish = locale === 'en';
+  const currentPath = path ?? (isEnglish ? '/en' : '/');
+  const koPath = currentPath.startsWith('/en') ? currentPath.slice(3) || '/' : currentPath;
+  const enPath = currentPath === '/' ? '/en' : currentPath.startsWith('/en') ? currentPath : `/en${currentPath}`;
 
   return (
     <header className="topbar">
@@ -17,8 +20,8 @@ export function SiteHeader({ locale }: { locale: 'ko' | 'en' }) {
           <Link href={isEnglish ? '/en/contact' : '/contact'}>{isEnglish ? 'Contact' : '문의'}</Link>
         </nav>
         <nav className="language-switch" aria-label={isEnglish ? 'Choose language' : '언어 선택'}>
-          <Link href="/" lang="ko" aria-current={!isEnglish ? 'page' : undefined}>한국어</Link>
-          <Link href="/en" lang="en" aria-current={isEnglish ? 'page' : undefined}>English</Link>
+          <Link href={koPath} lang="ko" aria-current={!isEnglish ? 'page' : undefined}>한국어</Link>
+          <Link href={enPath} lang="en" aria-current={isEnglish ? 'page' : undefined}>English</Link>
         </nav>
       </div>
     </header>
