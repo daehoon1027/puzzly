@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { InfoPage } from '../components/info-page';
 export const metadata: Metadata={title:'개인정보처리방침',description:'퍼즐리의 개인정보 처리, 외부 이미지, 쿠키 및 광고 관련 안내입니다.',alternates:{canonical:'/privacy'}};
-export default function Page(){return <InfoPage eyebrow="PRIVACY" title="개인정보처리방침" intro="퍼즐리는 필요한 정보만 최소한으로 다루며, 방문자가 서비스의 데이터 흐름을 이해할 수 있도록 공개합니다. 시행일: 2026년 8월 27일">
+export default function Page(){return <InfoPage path="/privacy" eyebrow="PRIVACY" title="개인정보처리방침" intro="퍼즐리는 필요한 정보만 최소한으로 다루며, 방문자가 서비스의 데이터 흐름을 이해할 수 있도록 공개합니다. 시행일: 2026년 8월 27일">
 <section><h2>1. 수집하는 개인정보</h2><p>퍼즐리는 회원가입 기능을 제공하지 않으며 이름, 전화번호, 주소 등의 개인정보를 직접 입력받아 서버에 저장하지 않습니다. 사용자가 입력한 이미지 검색어는 이미지 추천을 위해 일시적으로 처리되지만 퍼즐리의 사용자 계정이나 데이터베이스에 저장하지 않습니다. 선택한 퍼즐 이미지, 조각 수와 진행 상태는 브라우저에서 처리됩니다.</p></section>
 <section><h2>2. 자동으로 전달될 수 있는 정보</h2><p>사이트 접속 과정에서 호스팅 제공자 또는 외부 콘텐츠 제공자에게 IP 주소, 브라우저 종류, 접속 시각, 요청한 주소와 같은 일반적인 접속 정보가 전달될 수 있습니다. 이는 보안, 장애 대응, 이미지 제공 등 각 서비스의 운영 목적에 따라 처리될 수 있습니다.</p></section>
 <section><h2>3. 외부 이미지 서비스</h2><p>추천 이미지는 Pexels의 검색 API와 운영팀이 사전에 선별한 Unsplash 이미지에서 제공됩니다. 사용자가 검색을 실행하면 검색어가 퍼즐리 서버를 거쳐 Pexels에 전달되며, 이미지를 표시할 때 Pexels 또는 Unsplash 서버로 이미지 요청이 전송될 수 있습니다. 각 제공처의 개인정보처리방침이 적용될 수 있으며 퍼즐리는 외부 사이트의 데이터 처리 방식을 통제하지 않습니다.</p></section>

@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { SiteHeader } from './site-header';
 import { SiteFooter } from './site-footer';
 import { KakaoAd } from './kakao-ad';
@@ -252,20 +252,20 @@ function JigsawPiece({ piece, rows, columns, imageUrl, showImage, variant, class
   </svg>;
 }
 
-export function PuzzleHome({ locale }: { locale: Locale }) {
+export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = false, children }: { locale: Locale; preset?: Photo; defaultPieces?: number; embedded?: boolean; children?: ReactNode }) {
   const t = uiCopy[locale];
-  const initialQuery = t.initialQuery;
+  const initialQuery = preset?.label ?? t.initialQuery;
   const isEnglish = locale === 'en';
   const [keyword, setKeyword] = useState<string>(initialQuery);
   const [searched, setSearched] = useState<string>(initialQuery);
-  const [photos, setPhotos] = useState<Photo[]>(() => findPhotos(initialQuery, locale));
-  const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(() => findPhotos(initialQuery, locale)[0] ?? null);
-  const [initialLoading, setInitialLoading] = useState(true);
+  const [photos, setPhotos] = useState<Photo[]>(() => preset ? [preset] : findPhotos(initialQuery, locale));
+  const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(() => preset ?? findPhotos(initialQuery, locale)[0] ?? null);
+  const [initialLoading, setInitialLoading] = useState(!preset);
   const [searching, setSearching] = useState(false);
   const [loadingQuery, setLoadingQuery] = useState<string | null>(initialQuery);
   const [searchMessage, setSearchMessage] = useState('');
   const [fallbackNotice, setFallbackNotice] = useState<string | null>(null);
-  const [pieceCount, setPieceCount] = useState(20);
+  const [pieceCount, setPieceCount] = useState(defaultPieces);
   const [mode, setMode] = useState<PuzzleMode>('classic');
   const [pieces, setPieces] = useState<number[] | null>(null);
   const [trayPieces, setTrayPieces] = useState<number[]>([]);
@@ -290,6 +290,7 @@ export function PuzzleHome({ locale }: { locale: Locale }) {
     let active = true;
     const controller = new AbortController();
     document.documentElement.lang = locale;
+    if (preset) return;
 
     async function loadInitialPhotos() {
       try {
@@ -320,7 +321,7 @@ export function PuzzleHome({ locale }: { locale: Locale }) {
       active = false;
       controller.abort();
     };
-  }, [initialQuery, isEnglish, locale]);
+  }, [initialQuery, isEnglish, locale, preset]);
 
   async function recommend(searchKeyword = keyword) {
     if (busy) return;
@@ -395,11 +396,12 @@ export function PuzzleHome({ locale }: { locale: Locale }) {
     setCompleted(nextPlaced.length === pieceCount);
   }
 
+  const Container = embedded ? 'div' : 'main';
   return (
-    <main>
-      <SiteHeader locale={locale} />
+    <Container lang={locale} className={embedded ? 'embedded-puzzle' : undefined}>
+      {!embedded && <SiteHeader locale={locale} />}
 
-      <section className="hero" id="top">
+      {!embedded && <section className="hero" id="top">
         <div className="eyebrow"><span>✦</span> {t.eyebrow}</div>
         <h1>{t.heroLine1}<br/><em>{t.heroLine2}</em></h1>
         <p>{t.heroBody1}<br/>{t.heroBody2}</p>
@@ -416,7 +418,9 @@ export function PuzzleHome({ locale }: { locale: Locale }) {
           <p>{t.guide2}</p>
         </div>
         {searchMessage && <p className="search-message" role="status" aria-live="polite">{searchMessage}</p>}
-      </section>
+      </section>}
+
+      {children}
 
       <section className="workspace" id="make" aria-labelledby="recommend-title">
         <div className="section-heading">
@@ -545,7 +549,7 @@ export function PuzzleHome({ locale }: { locale: Locale }) {
         </div>}
       </section>}
 
-      <section className="home-content" id="notes" aria-labelledby="learn-title">
+      {!embedded && <section className="home-content" id="notes" aria-labelledby="learn-title">
         <div className="content-lead"><span>PUZZLE NOTES</span><h2 id="learn-title">{t.notesTitle}</h2><p>{t.notesIntro}</p></div>
         <div className="home-card-grid">
           {t.notes.map(([title, description], index) => <article key={title}><span>{String(index + 1).padStart(2, '0')}</span><h3>{title}</h3><p>{description}</p></article>)}
@@ -554,10 +558,10 @@ export function PuzzleHome({ locale }: { locale: Locale }) {
           {t.modeNotes.map(([title, description], index) => <div key={title}><span>VERSION {index + 1}</span><h3>{title}</h3><p>{description}</p></div>)}
         </div>
         <div className="home-faq"><div><span>QUICK FAQ</span><h2>{t.faqTitle}</h2></div><div className="faq-list">{t.faqs.map(([question, answer]) => <details key={question}><summary>{question}</summary><p>{answer}</p></details>)}</div></div>
-        <div className="content-links"><a href={isEnglish ? '#notes' : '/guide'}>{t.guideLink}</a><a href="/about">{t.principlesLink}</a></div>
-      </section>
+        <div className="content-links"><a href={isEnglish ? '/en/guide' : '/guide'}>{t.guideLink}</a><a href={isEnglish ? '/en/about' : '/about'}>{t.principlesLink}</a></div>
+      </section>}
 
-      <KakaoAd />
+      {!embedded && <KakaoAd />}
 
       {fallbackNotice && <div className="api-modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setFallbackNotice(null); }}>
         <section className="api-modal" role="alertdialog" aria-modal="true" aria-labelledby="api-modal-title" aria-describedby="api-modal-description">
@@ -576,7 +580,7 @@ export function PuzzleHome({ locale }: { locale: Locale }) {
         </section>
       </div>}
 
-      <SiteFooter locale={locale} />
-    </main>
+      {!embedded && <SiteFooter locale={locale} />}
+    </Container>
   );
 }

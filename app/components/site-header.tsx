@@ -15,7 +15,8 @@ export function SiteHeader({ locale, path }: { locale: 'ko' | 'en'; path?: strin
       <div className="header-actions">
         <nav className="site-nav" aria-label={isEnglish ? 'Main menu' : '주요 메뉴'}>
           <Link href={isEnglish ? '/en#make' : '/#make'}>{isEnglish ? 'Make a puzzle' : '퍼즐 만들기'}</Link>
-          <Link href={isEnglish ? '/en#notes' : '/guide'}>{isEnglish ? 'Puzzle guide' : '퍼즐 가이드'}</Link>
+          <Link href={isEnglish ? '/en/collections' : '/collections'}>{isEnglish ? 'Collections' : '테마별 퍼즐'}</Link>
+          <Link href={isEnglish ? '/en/guide' : '/guide'}>{isEnglish ? 'Puzzle guide' : '퍼즐 가이드'}</Link>
           <Link href={isEnglish ? '/en/about' : '/about'}>{isEnglish ? 'About' : '서비스 소개'}</Link>
           <Link href={isEnglish ? '/en/contact' : '/contact'}>{isEnglish ? 'Contact' : '문의'}</Link>
         </nav>

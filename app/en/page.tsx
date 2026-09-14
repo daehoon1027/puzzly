@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { PuzzleHome } from '../components/puzzle-home';
+import { CollectionCards } from '../components/collection-pages';
 
 export const metadata: Metadata = {
   title: { absolute: 'Free Online Photo Puzzle Game | Puzzly' },
@@ -29,5 +30,5 @@ export const metadata: Metadata = {
 };
 
 export default function EnglishHomePage() {
-  return <PuzzleHome locale="en" />;
+  return <PuzzleHome locale="en"><section className="home-collections"><span>LOOK · LEARN · PLAY</span><h2>Photo puzzles with a starting point</h2><p>Read the clues, then play the photograph you just studied.</p><CollectionCards locale="en" /></section></PuzzleHome>;
 }
