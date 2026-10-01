@@ -49,6 +49,7 @@ const uiCopy = {
   ko: {
     initialQuery: '알프스의 봄', eyebrow: '나만의 이미지 퍼즐', heroLine1: '상상한 장면을,', heroLine2: '퍼즐로 맞춰보세요.',
     heroBody1: '원하는 단어를 입력하면 어울리는 그림을 추천해드려요.', heroBody2: '마음에 드는 한 장을 골라 나만의 퍼즐을 시작하세요.',
+    quickStartEyebrow: '바로 시작', quickStartTitle: '먼저, 마음에 드는 그림을 골라보세요', quickStartMeta: '20피스 · 정사각형 교환', quickStartButton: '이 그림으로 바로 시작',
     searchLabel: '찾고 싶은 그림', placeholder: '예: 노을 진 바다, 귀여운 고양이, 서울 야경', searching: '찾는 중...', searchButton: '그림 찾기', suggestions: '이런 건 어때요?',
     tags: ['바다', '고양이', '도시 야경', '케이크'], guideTitle: '검색어 안내',
     guide1: '사물·장소·분위기나 인물의 특징과 상황을 구체적으로 적으면 더 잘 찾을 수 있어요. 예: ‘웃는 가족’, ‘빨간 우산을 든 사람’.',
@@ -81,6 +82,7 @@ const uiCopy = {
   en: {
     initialQuery: 'Spring in the Alps', eyebrow: 'YOUR OWN PHOTO PUZZLE', heroLine1: 'Turn any scene', heroLine2: 'into a puzzle.',
     heroBody1: 'Enter a few words and we will find images that fit.', heroBody2: 'Choose your favorite and start a puzzle made just for you.',
+    quickStartEyebrow: 'QUICK START', quickStartTitle: 'Choose a picture and start playing', quickStartMeta: '20 pieces · Square swap', quickStartButton: 'Start with this picture',
     searchLabel: 'Find an image', placeholder: 'Try: sunset beach, cute cat, city at night', searching: 'Searching...', searchButton: 'Find images', suggestions: 'Need an idea?',
     tags: ['Ocean', 'Cats', 'City at night', 'Cake'], guideTitle: 'Search tips',
     guide1: 'Describe an object, place, mood, or a person’s features and situation. For example: “smiling family” or “person with a red umbrella.”',
@@ -128,7 +130,7 @@ function findPhotos(keyword: string, locale: Locale) {
   else if (/동물|고양|강아|여우|코끼|새|말|사자|animal|cat|dog/.test(word)) preferred = photoSets.animal;
   else if (/도시|서울|야경|건물|거리|자동차|건축|city|street|night/.test(word)) preferred = photoSets.city;
   else if (/음식|요리|케이크|피자|커피|디저트|food|cake|pizza/.test(word)) preferred = photoSets.food;
-  else if (/산|숲|자연|알프스|꽃|정원|봄|가을|nature|forest|mountain/.test(word) || !word) preferred = photoSets.nature;
+  else if (/산|숲|자연|알프스|꽃|정원|봄|가을|nature|forest|mountain|alps|spring/.test(word) || !word) preferred = photoSets.nature;
 
   return withUnsplashCredit(preferred, locale);
 }
@@ -355,9 +357,9 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
     }
   }
 
-  function startPuzzle() {
+  function startPuzzle(count = pieceCount) {
     if (!selectedPhoto) return;
-    const nextPieces = shuffled(pieceCount);
+    const nextPieces = shuffled(count);
     setPieces(nextPieces);
     setTrayPieces(nextPieces);
     setPicked(null);
@@ -402,25 +404,40 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
       {!embedded && <SiteHeader locale={locale} />}
 
       {!embedded && <section className="hero" id="top">
-        <div className="eyebrow"><span>✦</span> {t.eyebrow}</div>
-        <h1>{t.heroLine1}<br/><em>{t.heroLine2}</em></h1>
-        <p>{t.heroBody1}<br/>{t.heroBody2}</p>
-        <div className="search-box">
-          <span className="search-icon">⌕</span>
-          <label className="sr-only" htmlFor="keyword">{t.searchLabel}</label>
-          <input id="keyword" value={keyword} onChange={(e) => setKeyword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && void recommend()} placeholder={t.placeholder} />
-          <button onClick={() => void recommend()} disabled={busy}>{busy ? t.searching : t.searchButton} <span>→</span></button>
+        <div className="hero-quickplay" aria-labelledby="quick-start-title">
+          <div className="quickplay-heading">
+            <div><span>{t.quickStartEyebrow}</span><h2 id="quick-start-title">{t.quickStartTitle}</h2></div>
+            <small>{t.quickStartMeta}</small>
+          </div>
+          <div className="quickplay-grid">
+            {photos.slice(0, 4).map((photo) => <button key={photo.id} className={selectedPhoto?.id === photo.id ? 'selected' : ''} onClick={() => setSelectedPhoto(photo)} aria-label={photo.label} aria-pressed={selectedPhoto?.id === photo.id}>
+              <Image src={photo.url} alt="" fill sizes="(max-width: 600px) 44vw, 240px" priority />
+              <span>{photo.label}</span>
+              {selectedPhoto?.id === photo.id && <b aria-hidden="true">✓</b>}
+            </button>)}
+          </div>
+          <button className="quickplay-start" onClick={() => { setPieceCount(20); setMode('classic'); startPuzzle(20); }} disabled={busy || !selectedPhoto}>{busy ? t.searching : t.quickStartButton}<span>→</span></button>
         </div>
-        <div className="quick-tags"><span>{t.suggestions}</span>{t.tags.map(tag => <button key={tag} disabled={busy} onClick={() => { setKeyword(tag); void recommend(tag); }}>#{tag}</button>)}</div>
-        <div className="search-guide">
-          <b>{t.guideTitle}</b>
-          <p>{t.guide1}</p>
-          <p>{t.guide2}</p>
-        </div>
-        {searchMessage && <p className="search-message" role="status" aria-live="polite">{searchMessage}</p>}
-      </section>}
 
-      {children}
+        <div className="hero-copy">
+          <div className="eyebrow"><span>✦</span> {t.eyebrow}</div>
+          <h1>{t.heroLine1}<br/><em>{t.heroLine2}</em></h1>
+          <p>{t.heroBody1}<br/>{t.heroBody2}</p>
+          <div className="search-box">
+            <span className="search-icon">⌕</span>
+            <label className="sr-only" htmlFor="keyword">{t.searchLabel}</label>
+            <input id="keyword" value={keyword} onChange={(e) => setKeyword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && void recommend()} placeholder={t.placeholder} />
+            <button onClick={() => void recommend()} disabled={busy}>{busy ? t.searching : t.searchButton} <span>→</span></button>
+          </div>
+          <div className="quick-tags"><span>{t.suggestions}</span>{t.tags.map(tag => <button key={tag} disabled={busy} onClick={() => { setKeyword(tag); void recommend(tag); }}>#{tag}</button>)}</div>
+          <details className="search-guide">
+            <summary>{t.guideTitle}</summary>
+            <p>{t.guide1}</p>
+            <p>{t.guide2}</p>
+          </details>
+          {searchMessage && <p className="search-message" role="status" aria-live="polite">{searchMessage}</p>}
+        </div>
+      </section>}
 
       <section className="workspace" id="make" aria-labelledby="recommend-title">
         <div className="section-heading">
@@ -467,7 +484,7 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
           <div className="difficulty" role="group" aria-label={t.piecesTitle}>
             {difficulties.map(count => <button key={count} onClick={() => setPieceCount(count)} className={pieceCount === count ? 'active' : ''}><b>{count}</b><span>{t.pieces}</span></button>)}
           </div>
-          <button className="start-button" onClick={startPuzzle} disabled={busy || !selectedPhoto}>{mode === 'classic' ? t.start1 : t.start2} <span>→</span></button>
+          <button className="start-button" onClick={() => startPuzzle()} disabled={busy || !selectedPhoto}>{mode === 'classic' ? t.start1 : t.start2} <span>→</span></button>
         </div>
       </section>
 
@@ -478,7 +495,7 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
             <h2>{completed ? t.completeTitle : mode === 'classic' ? t.classicTitle : t.shapeTitle}</h2>
             <p>{completed ? t.completeText(moves) : mode === 'classic' ? t.classicHelp : t.shapeHelp}</p>
           </div>
-          <div className="puzzle-actions"><button onClick={() => setShowReference(!showReference)}>◉ {t.original} {showReference ? t.hide : t.show}</button><button onClick={startPuzzle}>↻ {t.reshuffle}</button></div>
+          <div className="puzzle-actions"><button onClick={() => setShowReference(!showReference)}>◉ {t.original} {showReference ? t.hide : t.show}</button><button onClick={() => startPuzzle()}>↻ {t.reshuffle}</button></div>
         </div>
 
         {mode === 'classic' ? <div className="game-layout">
@@ -548,6 +565,8 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
           </aside>
         </div>}
       </section>}
+
+      {children}
 
       {!embedded && <section className="home-content" id="notes" aria-labelledby="learn-title">
         <div className="content-lead"><span>PUZZLE NOTES</span><h2 id="learn-title">{t.notesTitle}</h2><p>{t.notesIntro}</p></div>
