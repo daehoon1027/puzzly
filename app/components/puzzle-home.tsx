@@ -421,8 +421,8 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
 
         <div className="hero-copy">
           <div className="eyebrow"><span>✦</span> {t.eyebrow}</div>
-          <h1>{t.heroLine1}<br/><em>{t.heroLine2}</em></h1>
-          <p>{t.heroBody1}<br/>{t.heroBody2}</p>
+          <h1>{t.heroLine1} <em>{t.heroLine2}</em></h1>
+          <p>{t.heroBody1} {t.heroBody2}</p>
           <div className="search-box">
             <span className="search-icon">⌕</span>
             <label className="sr-only" htmlFor="keyword">{t.searchLabel}</label>

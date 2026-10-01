@@ -58,6 +58,14 @@ html { scroll-behavior:smooth; }
 body { margin:0; background:#fbfaf6; color:var(--ink); font-family:Arial, Helvetica, sans-serif; }
 button,input { font:inherit; }
 button { cursor:pointer; }
+.home-content :where(h1,h2,h3,p,li,summary,a,button),
+.info-page :where(h1,h2,h3,p,li,a,button),
+.hero :where(h1,h2,p,button),
+.workspace :where(h2,p,button),
+.puzzle-section :where(h2,p,button),
+.topbar :where(a,span),
+.site-footer :where(a,p,span) { overflow-wrap:break-word; text-wrap:pretty; }
+:lang(ko) :where(h1,h2,h3,p,li,summary,a,button,small,b,span) { word-break:keep-all; }
 .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
 .topbar { height:74px; display:flex; align-items:center; justify-content:space-between; max-width:1180px; margin:auto; padding:0 28px; border-bottom:1px solid #e6e0d5; }
 .brand { color:var(--ink); text-decoration:none; display:flex; align-items:center; gap:10px; font-size:20px; font-weight:900; letter-spacing:-1px; }
@@ -178,10 +186,11 @@ footer { min-height:150px; padding:40px max(24px,calc((100% - 1120px)/2)); displ
 .language-switch a[aria-current="page"] { background:var(--green); color:white; box-shadow:0 2px 7px rgba(47,98,79,.2); }
 .workspace { scroll-margin-top:20px; }
 .home-content { max-width:1120px; margin:0 auto; padding:96px 24px; }
-.content-lead { max-width:760px; }
+.content-lead { max-width:none; }
 .content-lead>span,.mode-explainer span,.home-faq>div>span,.info-hero>span { color:var(--orange); font-size:11px; font-weight:900; letter-spacing:2px; }
 .content-lead h2,.home-faq h2 { margin:12px 0 18px; font:500 clamp(32px,4vw,48px)/1.15 Georgia,serif; letter-spacing:-2px; }
-.content-lead p { color:var(--muted); font-size:16px; line-height:1.85; }
+.content-lead h2 { max-width:1000px; }
+.content-lead p { max-width:780px; color:var(--muted); font-size:16px; line-height:1.85; }
 .home-card-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin:48px 0 64px; }
 .home-card-grid article { padding:28px; border:1px solid #e3ddd2; border-radius:18px; background:white; }
 .home-card-grid article>span { color:var(--orange); font-weight:900; font-size:11px; }
