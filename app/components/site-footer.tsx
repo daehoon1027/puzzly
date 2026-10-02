@@ -13,6 +13,7 @@ export function SiteFooter({ locale }: { locale: 'ko' | 'en' }) {
         <p>{isEnglish ? 'Pick a scene and complete it one piece at a time.' : '원하는 장면을 고르고 한 조각씩 완성하는 무료 이미지 퍼즐입니다.'}</p>
       </div>
       <nav aria-label={isEnglish ? 'Footer menu' : '하단 메뉴'}>
+        <Link href={isEnglish ? '/en/photo-puzzle-maker' : '/photo-puzzle-maker'}>{isEnglish ? 'Make a photo puzzle' : '사진 퍼즐 만들기'}</Link>
         <Link href={isEnglish ? '/en/collections' : '/collections'}>{isEnglish ? 'Collections' : '테마별 퍼즐'}</Link>
         <Link href={isEnglish ? '/en/guide' : '/guide'}>{isEnglish ? 'Puzzle guide' : '퍼즐 가이드'}</Link>
         <Link href={isEnglish ? '/en/about' : '/about'}>{isEnglish ? 'About' : '서비스 소개'}</Link>

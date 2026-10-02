@@ -435,7 +435,7 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
             <p>{t.guide1}</p>
             <p>{t.guide2}</p>
           </details>
-          {searchMessage && <p className="search-message" role="status" aria-live="polite">{searchMessage}</p>}
+          {searchMessage && <p className="search-message" role="status" aria-live="polite" data-nosnippet>{searchMessage}</p>}
         </div>
       </section>}
 
@@ -582,7 +582,7 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
 
       {!embedded && <KakaoAd />}
 
-      {fallbackNotice && <div className="api-modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setFallbackNotice(null); }}>
+      {fallbackNotice && <div className="api-modal-backdrop" data-nosnippet onMouseDown={(event) => { if (event.target === event.currentTarget) setFallbackNotice(null); }}>
         <section className="api-modal" role="alertdialog" aria-modal="true" aria-labelledby="api-modal-title" aria-describedby="api-modal-description">
           <span className="api-modal-icon" aria-hidden="true">!</span>
           <div>
