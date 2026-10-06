@@ -92,10 +92,10 @@ export function PhotoPuzzleMakerPage({ locale }: { locale: 'ko' | 'en' }) {
     })),
   };
 
-  return <InfoPage locale={locale} path={pagePath} eyebrow={t.eyebrow} title={t.title} intro={t.intro}>
+  return <InfoPage compact locale={locale} path={pagePath} eyebrow={t.eyebrow} title={t.title} intro={t.intro}>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqStructuredData) }} />
     <p className="editorial-byline">{t.updated}</p>
-    <aside className="info-cta"><h2>{t.ctaTitle}</h2><p>{t.ctaBody}</p><Link href={`${base}/#make`}>{t.cta}</Link></aside>
+    <aside className="info-cta info-cta-first"><h2>{t.ctaTitle}</h2><p>{t.ctaBody}</p><Link href={`${base}/#make`}>{t.cta}</Link></aside>
     <section><h2>{t.howTitle}</h2><div className="text-grid">{t.steps.map(([title, body]) => <div key={title}><h3>{title}</h3><p>{body}</p></div>)}</div></section>
     <section><h2>{t.modeTitle}</h2><p>{t.modeBody}</p></section>
     <section><h2>{t.photoTitle}</h2><p>{t.photoBody}</p></section>

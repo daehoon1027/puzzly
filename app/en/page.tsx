@@ -31,5 +31,5 @@ export const metadata: Metadata = {
 };
 
 export default function EnglishHomePage() {
-  return <PuzzleHome locale="en"><section className="home-collections"><span>LOOK · LEARN · PLAY</span><h2>Photo puzzles with a starting point</h2><p>Read the clues, then play the photograph you just studied.</p><CollectionCards locale="en" /><div className="content-links"><Link href="/en/photo-puzzle-maker">How to make a photo puzzle and choose a piece count →</Link></div></section></PuzzleHome>;
+  return <PuzzleHome locale="en"><section className="home-collections"><span>FEATURED PUZZLES</span><h2>Start without searching</h2><p>Three approachable photographs, each with clues and a playable puzzle.</p><CollectionCards locale="en" slugs={['mountain-lake', 'snow-fox', 'sunset-beach']} /><div className="content-links"><Link href="/en/collections">See all six collection puzzles →</Link></div></section></PuzzleHome>;
 }

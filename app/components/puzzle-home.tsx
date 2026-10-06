@@ -568,16 +568,13 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
 
       {children}
 
-      {!embedded && <section className="home-content" id="notes" aria-labelledby="learn-title">
-        <div className="content-lead"><span>PUZZLE NOTES</span><h2 id="learn-title">{t.notesTitle}</h2><p>{t.notesIntro}</p></div>
-        <div className="home-card-grid">
-          {t.notes.map(([title, description], index) => <article key={title}><span>{String(index + 1).padStart(2, '0')}</span><h3>{title}</h3><p>{description}</p></article>)}
-        </div>
-        <div className="mode-explainer">
-          {t.modeNotes.map(([title, description], index) => <div key={title}><span>VERSION {index + 1}</span><h3>{title}</h3><p>{description}</p></div>)}
-        </div>
-        <div className="home-faq"><div><span>QUICK FAQ</span><h2>{t.faqTitle}</h2></div><div className="faq-list">{t.faqs.map(([question, answer]) => <details key={question}><summary>{question}</summary><p>{answer}</p></details>)}</div></div>
-        <div className="content-links"><a href={isEnglish ? '/en/guide' : '/guide'}>{t.guideLink}</a><a href={isEnglish ? '/en/about' : '/about'}>{t.principlesLink}</a></div>
+      {!embedded && <section className="home-shortcuts" id="notes" aria-labelledby="learn-title">
+        <div><span>NEED HELP?</span><h2 id="learn-title">{isEnglish ? 'Choose one clear next step' : '필요한 내용만 바로 확인하세요'}</h2><p>{isEnglish ? 'Detailed instructions live on their own pages, so the home page stays focused on choosing and playing.' : '홈에서는 사진 선택과 퍼즐 시작에 집중하고, 자세한 설명은 필요한 페이지에서만 제공합니다.'}</p></div>
+        <nav aria-label={isEnglish ? 'Help and information' : '도움말 및 안내'}>
+          <a href={isEnglish ? '/en/guide/first-puzzle' : '/guide/first-puzzle'}><b>{isEnglish ? 'Learn the controls' : '조작법 익히기'}</b><span>{isEnglish ? 'A two-tile practice' : '두 조각으로 짧게 연습'}</span></a>
+          <a href={isEnglish ? '/en/photo-puzzle-maker' : '/photo-puzzle-maker'}><b>{isEnglish ? 'Choose a piece count' : '조각 수 고르기'}</b><span>{isEnglish ? 'From 12 to 400 pieces' : '12~400피스 기준'}</span></a>
+          <a href={isEnglish ? '/en/editorial' : '/editorial'}><b>{isEnglish ? 'How content is checked' : '콘텐츠 검증 방법'}</b><span>{isEnglish ? 'Sources and testing' : '사진 출처와 테스트 절차'}</span></a>
+        </nav>
       </section>}
 
       {!embedded && <KakaoAd />}
