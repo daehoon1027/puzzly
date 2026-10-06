@@ -9,6 +9,10 @@ import { KakaoAd } from './kakao-ad';
 export type Locale = 'ko' | 'en';
 type Photo = { id: string; url: string; label: string; labelEn?: string; credit: string; sourceUrl?: string; photographerUrl?: string };
 type PuzzleMode = 'classic' | 'shape';
+type LeaderboardEntry = { rank: number; visitorCode: string; elapsedMs: number; moves: number; photoLabel: string; completedAt: string; isCurrent: boolean };
+type LeaderboardData = { entries: LeaderboardEntry[]; current: LeaderboardEntry | null; total: number };
+type ActiveRun = { runId: string | null; visitorId: string; startedAt: number };
+type RankResult = { status: 'idle' | 'saving' | 'saved' | 'error'; elapsedMs?: number; rank?: number; total?: number; bestElapsedMs?: number };
 
 const photoSets: Record<string, Photo[]> = {
   nature: [
@@ -60,7 +64,8 @@ const uiCopy = {
     piecesTitle: '몇 조각으로 도전할까요?', piecesDescription: '조각이 많을수록 더 오래, 더 깊게 몰입할 수 있어요.', pieces: '피스', start1: '버전 1 시작하기', start2: '버전 2 시작하기',
     completeTitle: '멋지게 완성했어요!', classicTitle: '정사각형 조각을 맞춰보세요', shapeTitle: '모양을 보고 빈자리에 끼워보세요', completeText: (moves: number) => `${moves}번의 이동으로 퍼즐을 완성했습니다.`,
     classicHelp: '옮길 조각과 자리를 차례로 눌러 서로 바꿔보세요.', shapeHelp: '오른쪽 조각을 끌어다 같은 모양의 빈 홈에 놓거나, 조각과 홈을 차례로 누르세요.', original: '원본', hide: '숨기기', show: '보기', reshuffle: '다시 섞기',
-    progress: '진행률', pieceCount: '조각 수', moveCount: '이동 횟수', classicTip: '모서리와 테두리 조각부터 맞추면 더 쉬워요.', tray: '조각함', remaining: (count: number) => `${count}개 남음`, dragHelp: '끌어서 왼쪽 홈에 놓으세요', moves: (count: number) => `이동 ${count}회`, shapeTip: '색과 모양을 함께 살펴보세요.',
+    progress: '진행률', pieceCount: '조각 수', moveCount: '이동 횟수', timeLabel: '완성 시간', classicTip: '모서리와 테두리 조각부터 맞추면 더 쉬워요.', tray: '조각함', remaining: (count: number) => `${count}개 남음`, dragHelp: '끌어서 왼쪽 홈에 놓으세요', moves: (count: number) => `이동 ${count}회`, shapeTip: '색과 모양을 함께 살펴보세요.',
+    leaderboardTitle: (count: number, mode: PuzzleMode) => `${count}피스 · ${mode === 'classic' ? '정사각형 교환' : '직소 끼우기'} 전체 순위`, leaderboardDescription: '같은 모드와 피스 수를 완성한 익명 참가자의 최고 기록을 빠른 시간순으로 표시합니다.', leaderboardRank: '순위', leaderboardPlayer: '참가자', leaderboardRecord: '기록', leaderboardPhoto: '퍼즐', leaderboardEmpty: '아직 완성 기록이 없습니다. 첫 번째 기록을 만들어보세요.', leaderboardLoading: '순위를 불러오는 중입니다.', leaderboardError: '순위표를 잠시 불러올 수 없습니다.', participant: (code: string) => `참가자 ${code}`, participantCount: (count: number) => `${count}명 참여`, currentBest: '내 최고 기록', savingRank: '전체 순위를 계산하고 있습니다.', rankSaveError: '완성 시간은 확인했지만 전체 순위에는 저장하지 못했습니다.', startPreparing: '기록 준비 중...',
     notesTitle: '그림을 고르는 순간부터 퍼즐은 시작됩니다', notesIntro: '퍼즐리는 단순히 조각을 섞는 도구가 아니라, 한 장의 이미지를 색·선·질감으로 다시 읽어보는 공간입니다. 처음에는 큰 색 영역을 찾고, 익숙해지면 작은 굴곡과 반복 무늬까지 관찰해보세요.',
     notes: [
       ['색이 나뉘는 그림부터', '하늘과 땅, 사물과 배경이 뚜렷한 이미지는 조각 위치를 예상하기 쉽습니다. 처음이라면 자연이나 도시 풍경으로 규칙을 익혀보세요.'],
@@ -73,7 +78,7 @@ const uiCopy = {
     ],
     faqTitle: '퍼즐리 이용 전 알아두세요', faqs: [
       ['회원가입이나 설치가 필요한가요?', '아니요. 웹 브라우저에서 바로 무료로 시작할 수 있으며 별도 계정을 만들 필요가 없습니다.'],
-      ['검색어와 퍼즐 진행 내용이 저장되나요?', '검색어는 이미지 추천을 위해 퍼즐리 서버를 거쳐 Pexels에 전달되지만 사용자 계정이나 데이터베이스에는 저장하지 않습니다. 퍼즐 진행 상태는 브라우저 화면 안에서만 처리됩니다.'],
+      ['검색어와 퍼즐 진행 내용이 저장되나요?', '검색어와 진행 중인 조각 위치는 저장하지 않습니다. 퍼즐을 완성하면 전체 순위를 위해 익명 브라우저 식별값, 모드, 피스 수, 완성 시간, 이동 횟수와 사진 이름만 저장합니다.'],
       ['모바일에서도 이용할 수 있나요?', '가능합니다. 다만 작은 화면에서 200~400피스는 조작이 세밀해질 수 있으므로 낮은 조각 수부터 시작하는 것을 권합니다.'],
     ],
     guideLink: '자세한 퍼즐 가이드 읽기 →', principlesLink: '퍼즐리 운영 원칙 보기 →',
@@ -93,7 +98,8 @@ const uiCopy = {
     piecesTitle: 'How many pieces?', piecesDescription: 'More pieces mean a longer, more immersive challenge.', pieces: 'pieces', start1: 'Start Version 1', start2: 'Start Version 2',
     completeTitle: 'Beautifully done!', classicTitle: 'Put the square tiles in place', shapeTitle: 'Match each piece to its space', completeText: (moves: number) => `You completed the puzzle in ${moves} moves.`,
     classicHelp: 'Select a tile, then select another position to swap them.', shapeHelp: 'Drag a piece from the tray to its matching space, or select the piece and then the space.', original: 'Original', hide: 'Hide', show: 'Show', reshuffle: 'Shuffle again',
-    progress: 'Progress', pieceCount: 'Pieces', moveCount: 'Moves', classicTip: 'Start with corners, borders, and strong color boundaries.', tray: 'Piece tray', remaining: (count: number) => `${count} left`, dragHelp: 'Drag pieces into the matching spaces', moves: (count: number) => `${count} moves`, shapeTip: 'Compare both color and shape.',
+    progress: 'Progress', pieceCount: 'Pieces', moveCount: 'Moves', timeLabel: 'Finish time', classicTip: 'Start with corners, borders, and strong color boundaries.', tray: 'Piece tray', remaining: (count: number) => `${count} left`, dragHelp: 'Drag pieces into the matching spaces', moves: (count: number) => `${count} moves`, shapeTip: 'Compare both color and shape.',
+    leaderboardTitle: (count: number, mode: PuzzleMode) => `${count} pieces · ${mode === 'classic' ? 'Square swap' : 'Shape fit'} leaderboard`, leaderboardDescription: 'The best result from each anonymous browser is ranked by fastest completion time for the same mode and piece count.', leaderboardRank: 'Rank', leaderboardPlayer: 'Player', leaderboardRecord: 'Time', leaderboardPhoto: 'Puzzle', leaderboardEmpty: 'No completed runs yet. Set the first record.', leaderboardLoading: 'Loading the leaderboard.', leaderboardError: 'The leaderboard is temporarily unavailable.', participant: (code: string) => `Player ${code}`, participantCount: (count: number) => `${count} players`, currentBest: 'My best', savingRank: 'Calculating your overall rank.', rankSaveError: 'Your finish time was measured, but it could not be added to the leaderboard.', startPreparing: 'Preparing record...',
     notesTitle: 'The puzzle begins when you choose the image', notesIntro: 'Puzzly is more than a tool that shuffles pieces. It is a place to rediscover an image through color, line, and texture. Start with broad areas of color, then look for small curves and repeating patterns.',
     notes: [
       ['Start with clear color regions', 'Images with a distinct sky, ground, subject, and background make piece positions easier to predict. Nature and city scenes are excellent places to learn the pattern.'],
@@ -106,7 +112,7 @@ const uiCopy = {
     ],
     faqTitle: 'Good to know before you play', faqs: [
       ['Do I need an account or an installation?', 'No. Puzzly runs free in your web browser, with no account or installation required.'],
-      ['Are my searches or puzzle progress saved?', 'Search terms pass through Puzzly to Pexels for image recommendations, but they are not stored in a user account or database. Puzzle progress stays only in the current browser page.'],
+      ['Are my searches or puzzle progress saved?', 'Search terms and in-progress piece positions are not saved. When you finish, an anonymous browser identifier, mode, piece count, finish time, moves, and photo title are stored for the shared leaderboard.'],
       ['Does it work on mobile?', 'Yes. On smaller screens, 200–400 piece puzzles require precise controls, so we recommend starting with fewer pieces.'],
     ],
     guideLink: 'Read the detailed puzzle guide →', principlesLink: 'See how Puzzly works →',
@@ -177,6 +183,28 @@ function gridDimensions(count: number) {
     }
   }
   return { rows: bestRows, columns: bestColumns };
+}
+
+function formatElapsed(milliseconds: number) {
+  const safeMilliseconds = Math.max(0, milliseconds);
+  const hours = Math.floor(safeMilliseconds / 3_600_000);
+  const minutes = Math.floor((safeMilliseconds % 3_600_000) / 60_000);
+  const seconds = Math.floor((safeMilliseconds % 60_000) / 1000);
+  const centiseconds = Math.floor((safeMilliseconds % 1000) / 10);
+  if (hours > 0) return `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(centiseconds).padStart(2, '0')}`;
+  return `${minutes}:${String(seconds).padStart(2, '0')}.${String(centiseconds).padStart(2, '0')}`;
+}
+
+function createVisitorId() {
+  try {
+    const stored = window.localStorage.getItem('puzzly-visitor-id');
+    if (stored) return stored;
+    const created = window.crypto.randomUUID();
+    window.localStorage.setItem('puzzly-visitor-id', created);
+    return created;
+  } catch {
+    return window.crypto.randomUUID();
+  }
 }
 
 type EdgeProfile = { sign: number; offset: number; size: number } | null;
@@ -278,6 +306,13 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
   const [moves, setMoves] = useState(0);
   const [completed, setCompleted] = useState(false);
   const [showReference, setShowReference] = useState(false);
+  const [visitorId, setVisitorId] = useState('');
+  const [activeRun, setActiveRun] = useState<ActiveRun | null>(null);
+  const [elapsedMs, setElapsedMs] = useState(0);
+  const [startingPuzzle, setStartingPuzzle] = useState(false);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardData | null>(null);
+  const [leaderboardState, setLeaderboardState] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [rankResult, setRankResult] = useState<RankResult>({ status: 'idle' });
   const busy = initialLoading || searching;
   const displayedQuery = loadingQuery ?? searched;
 
@@ -325,6 +360,44 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
     };
   }, [initialQuery, isEnglish, locale, preset]);
 
+  useEffect(() => {
+    const timer = window.setTimeout(() => setVisitorId(createVisitorId()), 0);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!visitorId) return;
+    let active = true;
+    const controller = new AbortController();
+    fetch(`/api/leaderboard?mode=${mode}&pieces=${pieceCount}&visitor=${encodeURIComponent(visitorId)}`, { signal: controller.signal, cache: 'no-store' })
+      .then(async (response) => {
+        if (!response.ok) throw new Error('leaderboard unavailable');
+        return response.json() as Promise<LeaderboardData>;
+      })
+      .then((data) => {
+        if (!active) return;
+        setLeaderboard(data);
+        setLeaderboardState('ready');
+      })
+      .catch((error) => {
+        if (!active || (error instanceof Error && error.name === 'AbortError')) return;
+        setLeaderboard(null);
+        setLeaderboardState('error');
+      });
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [mode, pieceCount, visitorId]);
+
+  useEffect(() => {
+    if (!activeRun || completed) return;
+    const update = () => setElapsedMs(Date.now() - activeRun.startedAt);
+    update();
+    const interval = window.setInterval(update, 50);
+    return () => window.clearInterval(interval);
+  }, [activeRun, completed]);
+
   async function recommend(searchKeyword = keyword) {
     if (busy) return;
     const term = searchKeyword.trim() || (isEnglish ? 'nature' : '자연');
@@ -357,9 +430,31 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
     }
   }
 
-  function startPuzzle(count = pieceCount) {
+  async function startPuzzle(count = pieceCount, selectedMode: PuzzleMode = mode) {
     if (!selectedPhoto) return;
+    setStartingPuzzle(true);
+    if (count !== pieceCount || selectedMode !== mode) setLeaderboardState('loading');
+    const currentVisitorId = visitorId || createVisitorId();
+    if (!visitorId) setVisitorId(currentVisitorId);
+    let runId: string | null = null;
+    let startedAt = Date.now();
+    try {
+      const response = await fetch('/api/leaderboard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'start', visitorId: currentVisitorId, locale, mode: selectedMode, pieceCount: count, photoId: selectedPhoto.id, photoLabel: selectedPhoto.label }),
+      });
+      if (response.ok) {
+        const data = await response.json() as { runId: string; startedAt: string };
+        runId = data.runId;
+        startedAt = Date.parse(data.startedAt);
+      }
+    } catch {
+      // The puzzle remains playable even if the shared leaderboard is temporarily offline.
+    }
     const nextPieces = shuffled(count);
+    setMode(selectedMode);
+    setPieceCount(count);
     setPieces(nextPieces);
     setTrayPieces(nextPieces);
     setPicked(null);
@@ -368,7 +463,39 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
     setMissedSlot(null);
     setMoves(0);
     setCompleted(false);
+    setElapsedMs(0);
+    setActiveRun({ runId, visitorId: currentVisitorId, startedAt });
+    setRankResult({ status: 'idle' });
+    setStartingPuzzle(false);
     setTimeout(() => document.getElementById('puzzle')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  }
+
+  async function finishPuzzle(nextMoves: number) {
+    if (completed) return;
+    const measuredTime = elapsedMs;
+    setElapsedMs(measuredTime);
+    setCompleted(true);
+    if (!activeRun?.runId) {
+      setRankResult({ status: 'error', elapsedMs: measuredTime });
+      return;
+    }
+
+    setRankResult({ status: 'saving', elapsedMs: measuredTime });
+    try {
+      const response = await fetch('/api/leaderboard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'complete', visitorId: activeRun.visitorId, runId: activeRun.runId, moves: nextMoves }),
+      });
+      if (!response.ok) throw new Error('ranking failed');
+      const data = await response.json() as LeaderboardData & { submittedElapsedMs: number };
+      setLeaderboard({ entries: data.entries, current: data.current, total: data.total });
+      setLeaderboardState('ready');
+      setElapsedMs(data.submittedElapsedMs);
+      setRankResult({ status: 'saved', elapsedMs: data.submittedElapsedMs, rank: data.current?.rank, total: data.total, bestElapsedMs: data.current?.elapsedMs });
+    } catch {
+      setRankResult({ status: 'error', elapsedMs: measuredTime });
+    }
   }
 
   function selectPiece(index: number) {
@@ -379,13 +506,16 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
     [next[picked], next[index]] = [next[index], next[picked]];
     setPieces(next);
     setPicked(null);
-    setMoves((value) => value + 1);
-    setCompleted(next.every((piece, pieceIndex) => piece === pieceIndex));
+    const nextMoves = moves + 1;
+    const isComplete = next.every((piece, pieceIndex) => piece === pieceIndex);
+    setMoves(nextMoves);
+    if (isComplete) void finishPuzzle(nextMoves);
   }
 
   function placeShapePiece(piece: number, slot: number) {
     if (!pieces || completed || placed.includes(piece)) return;
-    setMoves((value) => value + 1);
+    const nextMoves = moves + 1;
+    setMoves(nextMoves);
     if (piece !== slot) {
       setMissedSlot(slot);
       window.setTimeout(() => setMissedSlot(null), 350);
@@ -395,7 +525,7 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
     setPlaced(nextPlaced);
     setTrayPieces((current) => current.filter((item) => item !== piece));
     setSelectedTrayPiece(null);
-    setCompleted(nextPlaced.length === pieceCount);
+    if (nextPlaced.length === pieceCount) void finishPuzzle(nextMoves);
   }
 
   const Container = embedded ? 'div' : 'main';
@@ -416,7 +546,7 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
               {selectedPhoto?.id === photo.id && <b aria-hidden="true">✓</b>}
             </button>)}
           </div>
-          <button className="quickplay-start" onClick={() => { setPieceCount(20); setMode('classic'); startPuzzle(20); }} disabled={busy || !selectedPhoto}>{busy ? t.searching : t.quickStartButton}<span>→</span></button>
+          <button className="quickplay-start" onClick={() => void startPuzzle(20, 'classic')} disabled={busy || startingPuzzle || !selectedPhoto}>{startingPuzzle ? t.startPreparing : busy ? t.searching : t.quickStartButton}<span>→</span></button>
         </div>
 
         <div className="hero-copy">
@@ -466,12 +596,12 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
         <div className="mode-section">
           <div className="setup-copy"><span className="step">02</span><h2>{t.modeTitle}</h2><p>{t.modeDescription}</p></div>
           <div className="mode-picker" role="group" aria-label={t.modeTitle}>
-            <button className={mode === 'classic' ? 'active' : ''} onClick={() => setMode('classic')} aria-pressed={mode === 'classic'}>
+            <button className={mode === 'classic' ? 'active' : ''} onClick={() => { setMode('classic'); setLeaderboardState('loading'); }} aria-pressed={mode === 'classic'}>
               <span className="mode-visual classic-visual"><i/><i/><i/><i/></span>
               <span><b>{t.version1}</b><small>{t.squareSwap}</small></span>
               <em>{mode === 'classic' ? '✓' : ''}</em>
             </button>
-            <button className={mode === 'shape' ? 'active' : ''} onClick={() => setMode('shape')} aria-pressed={mode === 'shape'}>
+            <button className={mode === 'shape' ? 'active' : ''} onClick={() => { setMode('shape'); setLeaderboardState('loading'); }} aria-pressed={mode === 'shape'}>
               <span className="mode-visual shape-visual"><i/><i/><i/></span>
               <span><b>{t.version2}</b><small>{t.shapeFit}</small></span>
               <em>{mode === 'shape' ? '✓' : ''}</em>
@@ -482,10 +612,29 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
         <div className="setup-card">
           <div className="setup-copy"><span className="step">03</span><h2>{t.piecesTitle}</h2><p>{t.piecesDescription}</p></div>
           <div className="difficulty" role="group" aria-label={t.piecesTitle}>
-            {difficulties.map(count => <button key={count} onClick={() => setPieceCount(count)} className={pieceCount === count ? 'active' : ''}><b>{count}</b><span>{t.pieces}</span></button>)}
+            {difficulties.map(count => <button key={count} onClick={() => { setPieceCount(count); setLeaderboardState('loading'); }} className={pieceCount === count ? 'active' : ''}><b>{count}</b><span>{t.pieces}</span></button>)}
           </div>
-          <button className="start-button" onClick={() => startPuzzle()} disabled={busy || !selectedPhoto}>{mode === 'classic' ? t.start1 : t.start2} <span>→</span></button>
+          <button className="start-button" onClick={() => void startPuzzle()} disabled={busy || startingPuzzle || !selectedPhoto}>{startingPuzzle ? t.startPreparing : mode === 'classic' ? t.start1 : t.start2} <span>→</span></button>
         </div>
+
+        <section className="leaderboard" id="leaderboard" aria-labelledby="leaderboard-title">
+          <div className="leaderboard-heading">
+            <div><span>LIVE RANKING</span><h2 id="leaderboard-title">{t.leaderboardTitle(pieceCount, mode)}</h2><p>{t.leaderboardDescription}</p></div>
+            {leaderboardState === 'ready' && <b>{t.participantCount(leaderboard?.total ?? 0)}</b>}
+          </div>
+          {leaderboardState === 'loading' ? <p className="leaderboard-message" role="status">{t.leaderboardLoading}</p>
+            : leaderboardState === 'error' ? <p className="leaderboard-message error" role="status">{t.leaderboardError}</p>
+            : !leaderboard?.entries.length ? <p className="leaderboard-message">{t.leaderboardEmpty}</p>
+            : <div className="leaderboard-table" role="table" aria-label={t.leaderboardTitle(pieceCount, mode)}>
+              <div className="leaderboard-row leaderboard-columns" role="row"><span role="columnheader">{t.leaderboardRank}</span><span role="columnheader">{t.leaderboardPlayer}</span><span role="columnheader">{t.leaderboardRecord}</span><span role="columnheader">{t.leaderboardPhoto}</span></div>
+              {leaderboard.entries.map((entry) => <div className={`leaderboard-row ${entry.isCurrent ? 'current' : ''}`} role="row" key={`${entry.rank}-${entry.visitorCode}`}>
+                <strong role="cell">{entry.rank}</strong><span role="cell">{t.participant(entry.visitorCode)}{entry.isCurrent && <em>{t.currentBest}</em>}</span><b role="cell">{formatElapsed(entry.elapsedMs)}</b><small role="cell">{entry.photoLabel} · {t.moves(entry.moves)}</small>
+              </div>)}
+              {leaderboard.current && leaderboard.current.rank > 10 && <><div className="leaderboard-gap" aria-hidden="true">•••</div><div className="leaderboard-row current" role="row">
+                <strong role="cell">{leaderboard.current.rank}</strong><span role="cell">{t.participant(leaderboard.current.visitorCode)}<em>{t.currentBest}</em></span><b role="cell">{formatElapsed(leaderboard.current.elapsedMs)}</b><small role="cell">{leaderboard.current.photoLabel} · {t.moves(leaderboard.current.moves)}</small>
+              </div></>}
+            </div>}
+        </section>
       </section>
 
       {pieces && selectedPhoto && <section className="puzzle-section" id="puzzle">
@@ -495,8 +644,15 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
             <h2>{completed ? t.completeTitle : mode === 'classic' ? t.classicTitle : t.shapeTitle}</h2>
             <p>{completed ? t.completeText(moves) : mode === 'classic' ? t.classicHelp : t.shapeHelp}</p>
           </div>
-          <div className="puzzle-actions"><button onClick={() => setShowReference(!showReference)}>◉ {t.original} {showReference ? t.hide : t.show}</button><button onClick={() => startPuzzle()}>↻ {t.reshuffle}</button></div>
+          <div className="puzzle-actions"><span className="puzzle-timer"><small>{t.timeLabel}</small><b>{formatElapsed(elapsedMs)}</b></span><button onClick={() => setShowReference(!showReference)}>◉ {t.original} {showReference ? t.hide : t.show}</button><button onClick={() => void startPuzzle()} disabled={startingPuzzle}>↻ {t.reshuffle}</button></div>
         </div>
+
+        {completed && <div className={`completion-ranking ${rankResult.status}`} role="status" aria-live="polite">
+          <p><span>{t.timeLabel}</span><b>{formatElapsed(rankResult.elapsedMs ?? elapsedMs)}</b></p>
+          <p><span>{t.leaderboardRank}</span><b>{rankResult.status === 'saved' && rankResult.rank ? `${rankResult.rank}` : '—'}</b></p>
+          <p><span>{isEnglish ? 'Players' : '전체 참가자'}</span><b>{rankResult.status === 'saved' ? rankResult.total : '—'}</b></p>
+          <div>{rankResult.status === 'saving' ? t.savingRank : rankResult.status === 'error' ? t.rankSaveError : rankResult.status === 'saved' && rankResult.bestElapsedMs && rankResult.bestElapsedMs < (rankResult.elapsedMs ?? 0) ? `${t.currentBest}: ${formatElapsed(rankResult.bestElapsedMs)}` : t.currentBest}</div>
+        </div>}
 
         {mode === 'classic' ? <div className="game-layout">
           <div className="board-wrap">
