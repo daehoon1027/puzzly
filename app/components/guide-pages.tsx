@@ -8,10 +8,11 @@ import { TileLesson } from './tile-lesson';
 
 export function GuideIndex({ locale }: { locale: Language }) {
   const en = locale === 'en'; const base = en ? '/en' : '';
-  return <InfoPage locale={locale} path={`${base}/guide`} eyebrow="PUZZLE FIELD GUIDE" title={en ? 'Learn a move. Read a photograph.' : '조작부터 관찰까지, 직접 해보는 퍼즐 가이드'} intro={en ? 'Start with a short swap exercise, then use real examples to choose a photo, a count, and your next clue.' : '짧은 교환 실습부터 시작해 사진 선택, 조각 수 비교, 막힌 상황의 풀이법을 실제 사례로 익힙니다.'}>
+  return <InfoPage locale={locale} path={`${base}/guide`} eyebrow="PUZZLE FIELD GUIDE" title={en ? 'Learn a move. Read a photograph.' : '조작부터 관찰까지, 직접 해보는 퍼즐 가이드'} intro={en ? 'Seven practical guides connect the controls to real photographs, mobile play, repeatable clues, and a simple way to compare two sessions.' : '일곱 개의 실전 가이드에서 조작법과 실제 사진, 모바일 이용, 반복 가능한 단서와 두 판 비교법을 연결합니다.'}>
     <div className="article-links">{guides.map((guide, i) => <Link key={guide.slug} href={`${base}/guide/${guide.slug}`}><span>0{i + 1}</span><h2>{guide[locale].title}</h2><p>{guide[locale].summary}</p></Link>)}</div>
-    <section><h2>{en ? 'A route for your first visit' : '처음이라면 이 순서로 해보세요'}</h2><p>{en ? 'Complete the two-tile exercise, open Mountain lake with 20 pieces, and locate the cabin before starting. Once it feels familiar, keep the photo and raise the count to 48. Move to the forest when you want to practise repeated lines, or the skyline for rooftops and overlapping shapes.' : '두 조각 교환 실습을 마친 뒤 산과 호수 20피스를 열어 오두막의 위치부터 확인하세요. 익숙해지면 사진을 유지하고 48피스로 늘립니다. 반복되는 선을 연습하려면 숲으로, 지붕과 겹치는 형태를 보려면 도시로 넘어가세요.'}</p></section>
+    <section><h2>{en ? 'A route for your first visit' : '처음이라면 이 순서로 해보세요'}</h2><p>{en ? 'Complete the two-tile exercise, open Mountain lake with 20 pieces, and locate the cabin before starting. Next learn the four anchor types, then compare 20, 48, and 120 pieces without changing the photograph. Use the mobile guide before a longer phone session.' : '두 조각 교환 실습을 마친 뒤 산과 호수 20피스를 열어 오두막의 위치부터 확인하세요. 다음으로 네 가지 기준점을 익히고, 사진을 바꾸지 않은 채 20·48·120피스를 비교합니다. 휴대폰에서 긴 퍼즐을 시작하기 전에는 모바일 조작 안내를 먼저 확인하세요.'}</p></section>
     <section><h2>{en ? 'Before a longer puzzle' : '긴 퍼즐을 시작하기 전에'}</h2><p>{en ? 'Progress is kept only in the current page and is lost on refresh or navigation. Square swap counts exchanges; shape fit counts placement attempts, including misses. Do not compare those totals as equivalent scores. There is no account or installation.' : '진행은 현재 페이지 안에서만 유지되며 새로고침이나 페이지 이동 시 사라집니다. 정사각형 교환은 교환 횟수, 직소는 실패를 포함한 배치 시도를 세므로 두 모드의 숫자를 같은 점수처럼 비교하지 마세요. 회원가입과 설치는 필요하지 않습니다.'}</p></section>
+    <section><h2>{en ? 'What we tested before publishing' : '게시 전에 확인한 항목'}</h2><p>{en ? 'Guide instructions are checked against the current controls, the exact collection crop, and the stated counting rules. Claims about completion time, concentration, or age are deliberately avoided because Puzzly does not collect evidence for them.' : '가이드의 조작 순서, 컬렉션의 실제 4:3 사진 영역, 이동 횟수 집계 방식을 현재 서비스에서 확인합니다. 퍼즐리는 완성 시간·집중력·연령 효과를 측정하지 않으므로 그런 효과를 단정하지 않습니다.'}</p><p><Link href={`${base}/editorial`}>{en ? 'See the full writing and testing process →' : '전체 작성·검증 절차 보기 →'}</Link></p></section>
     <CollectionCards locale={locale} />
   </InfoPage>;
 }
@@ -24,7 +25,7 @@ export function GuideDetail({ slug, locale }: { slug: string; locale: Language }
   const guide = guides.find(item => item.slug === slug)!; const copy = guide[locale];
   const en = locale === 'en'; const base = en ? '/en' : '';
   return <InfoPage locale={locale} path={`${base}/guide/${slug}`} eyebrow="PUZZLY PRACTICAL GUIDE" title={copy.title} intro={copy.summary}>
-    <p className="editorial-byline">{en ? 'Puzzly guide · Updated September 14, 2026' : '퍼즐리 이용 가이드 · 2026년 9월 14일 업데이트'}</p>
+    <p className="editorial-byline">{en ? <>Written and play-tested by <Link href="/en/editorial">Puzzly creator daehoon1027</Link> · Updated October 6, 2026</> : <>작성·플레이 검증 <Link href="/editorial">퍼즐리 제작자 daehoon1027</Link> · 2026년 10월 6일 업데이트</>}</p>
     {slug === 'first-puzzle' && <TileLesson locale={locale} imageUrl={collectionPhoto(collections[0], locale).url} />}
     {slug === 'piece-count' && <GridComparison locale={locale} />}
     {copy.sections.map(([title, body]) => <section key={title}><h2>{title}</h2><p>{body}</p></section>)}

@@ -231,6 +231,10 @@ footer { min-height:150px; padding:40px max(24px,calc((100% - 1120px)/2)); displ
 .guide-table { margin-top:26px; border:1px solid #ddd6ca; border-radius:14px; overflow:hidden; }
 .guide-table>div { display:grid; grid-template-columns:.65fr 1fr 1.5fr; gap:16px; padding:13px 18px; border-top:1px solid #e5dfd5; font-size:13px; }
 .guide-table>div:first-child { border:0; background:#eee8de; }
+.revision-list { margin-top:26px; border:1px solid #ddd6ca; border-radius:14px; overflow:hidden; }
+.revision-list>div { display:grid; grid-template-columns:minmax(150px,.7fr) 2fr; gap:16px; padding:15px 18px; border-top:1px solid #e5dfd5; font-size:13px; line-height:1.6; }
+.revision-list>div:first-child { border-top:0; }
+.revision-list b { color:var(--green); }
 .contact-button { color:white!important; }
 
 @media (max-width:760px) {
@@ -255,6 +259,7 @@ footer { min-height:150px; padding:40px max(24px,calc((100% - 1120px)/2)); displ
   .info-page { padding:60px 22px 80px; }
   .guide-table>div { grid-template-columns:.7fr 1fr; }
   .guide-table>div>*:last-child { grid-column:1/3; }
+  .revision-list>div { grid-template-columns:1fr; gap:6px; }
 }
 
 

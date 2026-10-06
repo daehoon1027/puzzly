@@ -67,4 +67,55 @@ export const guides = [
       ['Keep one useful note for next time', 'Instead of “that was difficult,” note “I confused water and mountains by using color alone.” Next time, begin by changing that specific clue. Rest or reduce the count if you are tired or the screen is too small. Puzzly is not a speed contest or a test of your ability to concentrate.'],
     ] },
   },
+  {
+    slug: 'anchor-system',
+    ko: { title: '여섯 장의 사진으로 익히는 네 가지 기준점', summary: '색 영역·경계선·고유 형태·반복의 예외를 실제 컬렉션 사진에서 찾는 관찰 순서입니다.', sections: [
+      ['1. 넓은 색 영역은 후보를 나누는 첫 단계입니다', '해변에서는 하늘·바다·모래, 도시에서는 하늘·수면·건물이 큰 층을 이룹니다. 이 단계의 목적은 정답을 확정하는 것이 아니라 후보를 위·가운데·아래처럼 나누는 것입니다. 비슷한 색이 다른 영역에도 나타날 수 있으므로 색만으로 자리를 결정하지 말고 다음 단서를 찾을 범위를 줄이는 데 사용하세요.'],
+      ['2. 경계선의 방향으로 조각의 순서를 좁힙니다', '호수의 물가는 거의 수평이고, 해변의 포말은 굽으며, 케이크의 윗면은 타원형입니다. 같은 흰색이나 회색 조각이라도 선이 곧은지, 어느 방향으로 휘는지, 선 양쪽의 질감이 무엇인지 비교하면 이웃 조각을 정할 수 있습니다. 경계가 화면 끝에서 어디로 나가는지도 함께 보세요.'],
+      ['3. 고유 형태는 가장 먼저 고정할 기준점입니다', '호수의 오두막, 여우의 귀와 코, 도시의 서로 다른 지붕처럼 한 번만 등장하는 형태를 찾습니다. 고유 형태 하나를 완성하면 그 주변 조각은 전체 사진이 아니라 해당 사물의 이웃과만 비교하면 됩니다. 다만 눈에 띈다는 이유로 사진 중앙에 있다고 가정하지 말고 원본에서 정확한 위치를 확인하세요.'],
+      ['4. 반복 무늬에서는 예외를 찾습니다', '숲의 나무줄기, 도시의 창문, 케이크의 크림은 비슷한 모양이 반복됩니다. 이때 모든 반복을 한꺼번에 맞추려 하지 말고 굵기가 다른 줄기, 높이가 다른 지붕, 일부가 가려진 장식처럼 반복이 깨지는 지점을 찾으세요. 예외 하나를 고정한 뒤 바로 옆 반복을 순서대로 연결하는 편이 안정적입니다.'],
+      ['5. 단서가 충돌하면 두 조건이 함께 맞는지 봅니다', '색은 맞지만 선이 끊기거나, 모양은 이어지지만 빛의 방향이 바뀌면 아직 근거가 부족합니다. 최소 두 가지 조건이 동시에 맞을 때 위치를 유지하세요. 예를 들어 여우 몸통의 주황색뿐 아니라 등의 윤곽까지, 해변의 흰색뿐 아니라 포말의 굽은 방향까지 확인하는 방식입니다.'],
+    ] },
+    en: { title: 'Four anchor types across six photographs', summary: 'Use broad color, boundaries, unique shapes, and breaks in repetition in a consistent order.', sections: [
+      ['1. Broad color is a first division, not a final answer', 'Beach separates into sky, sea, and sand; skyline separates into sky, water, and buildings. Use those regions to divide candidates into broad positions. Similar colors can appear elsewhere, so color should narrow the search rather than prove a location.'],
+      ['2. Boundary direction narrows the order', 'The lake shoreline is nearly horizontal, beach foam bends, and the cake rim forms an oval. Compare whether a line is straight or curved, where it turns, and the texture on both sides. Also notice where a boundary leaves the edge of a tile.'],
+      ['3. A unique shape becomes the first anchor', 'The cabin, the fox ears and nose, and distinct rooftops occur only once. Once such a shape is placed, neighboring pieces need to be compared only with that object. Do not assume a prominent subject is centered; confirm its actual position in the original.'],
+      ['4. Find the break inside repetition', 'Forest trunks, window grids, and cream swirls repeat. Look for the different trunk width, roof height, or partly hidden decoration that interrupts the pattern. Fix one exception, then connect its immediate neighbors in order.'],
+      ['5. Keep a placement when two clues agree', 'Matching color with a broken line, or matching shape with reversed light, is weak evidence. Keep a position when at least two conditions agree: orange fur plus the back contour, or white foam plus the direction of its curve.'],
+    ] },
+  },
+  {
+    slug: 'mobile-play',
+    ko: { title: '휴대폰에서 사진 퍼즐을 편하게 조작하는 순서', summary: '작은 화면에서 사진·조각 수·탭 조작을 조정하고 중단 위험을 줄이는 실제 이용 안내입니다.', sections: [
+      ['1. 세로 화면에서는 12~30피스로 조작부터 확인하세요', '휴대폰에서는 같은 조각 수도 각 조각의 표시 면적이 작습니다. 첫 판은 12피스나 20피스로 시작해 선택 표시와 원본 보기 버튼의 위치를 확인하세요. 30피스에서 경계선이 보인다면 그대로 올리고, 손가락으로 원하는 조각을 안정적으로 선택하기 어렵다면 사진을 바꾸기보다 먼저 조각 수를 낮추세요.'],
+      ['2. 정사각형 교환은 끌지 말고 두 번 탭합니다', '버전 1에서는 옮길 조각을 한 번 탭하고, 바꿀 위치를 다시 탭합니다. 첫 조각에 선택 표시가 생겼는지 확인한 뒤 화면을 스크롤하세요. 같은 조각을 다시 탭하면 선택이 취소되므로 반응이 없다고 빠르게 연속 탭하지 않는 편이 좋습니다.'],
+      ['3. 직소 모드는 조각과 홈을 차례로 선택할 수 있습니다', '작은 조각을 길게 끌기 어렵다면 조각함에서 한 조각을 탭한 뒤 왼쪽의 빈 홈을 탭하세요. 맞는 자리라면 고정되고, 틀리면 조각함에 남습니다. 조각함 안에서 스크롤할 때는 조각 중앙보다 빈 여백에서 손가락을 움직이면 의도치 않은 선택을 줄일 수 있습니다.'],
+      ['4. 작은 화면에는 큰 기준점이 있는 사진이 유리합니다', '여우처럼 주제가 한 개이거나 호수처럼 오두막이 있는 사진은 축소해도 출발점을 찾기 쉽습니다. 숲의 반복되는 줄기나 케이크의 작은 장식은 조각 수가 많을수록 구분하기 어렵습니다. 사진 카드에서 기준점 세 곳을 말할 수 있는지 확인한 뒤 시작하세요.'],
+      ['5. 새로고침과 페이지 이동 전에 현재 판을 마치세요', '퍼즐 진행은 서버 계정에 저장되지 않습니다. 전화 수신이나 다른 앱 전환 자체는 판을 지우지 않지만, 브라우저가 페이지를 새로 불러오거나 탭을 닫으면 이어서 할 수 없습니다. 긴 120피스 이상은 안정적인 화면과 시간을 확보한 뒤 선택하고, 이동 중에는 짧은 판을 권합니다.'],
+    ] },
+    en: { title: 'A practical order for playing on a phone', summary: 'Adjust photo, count, and tap controls for a smaller screen and reduce the risk of losing a long puzzle.', sections: [
+      ['1. Confirm the controls with 12–30 pieces', 'Each piece occupies less screen area on a phone. Begin with 12 or 20 pieces and locate selection feedback and the Original control. Increase the count only while boundaries remain visible; if tapping becomes unreliable, reduce the count before changing the photograph.'],
+      ['2. Square swap uses two taps, not a drag', 'Tap the piece to move, then tap its destination. Confirm the first selection highlight before scrolling. Tapping the same tile again cancels it, so avoid rapid repeated taps when waiting for visual feedback.'],
+      ['3. Shape fit also supports tap then space', 'If dragging a small piece is awkward, tap it in the tray and then tap the empty space. A correct piece stays; a wrong one remains in the tray. Scroll from tray padding rather than directly over a piece to reduce accidental selection.'],
+      ['4. Choose photographs with large anchors', 'A single fox or a lake cabin remains recognizable when reduced. Repeating forest trunks and small cake decorations become harder at high counts. Before starting, check whether you can name three distinct anchors in the card.'],
+      ['5. Finish before a reload or navigation', 'Progress is not stored in an account. Switching apps alone does not intentionally reset the board, but a browser reload or closed tab does. Reserve 120 pieces and above for a stable screen and enough time; use a shorter puzzle while moving.'],
+    ] },
+  },
+  {
+    slug: 'compare-sessions',
+    ko: { title: '같은 사진 두 판을 비교하는 간단한 기록법', summary: '완성 시간 대신 출발점·원본 확인·막힌 영역을 기록해 자신에게 맞는 풀이법을 찾습니다.', sections: [
+      ['1. 사진·모드·조각 수를 먼저 고정하세요', '두 판을 비교할 때는 한 번에 한 조건만 바꿉니다. 예를 들어 산과 호수 48피스 정사각형 교환을 두 번 진행하고, 첫 판은 오두막에서, 둘째 판은 물가에서 시작합니다. 사진과 조각 수까지 바꾸면 어느 선택이 차이를 만들었는지 알기 어렵습니다.'],
+      ['2. 시작 전에 첫 기준점을 한 줄로 적습니다', '‘오두막 지붕부터’, ‘포말의 가장 긴 곡선부터’처럼 실제로 찾을 형태를 기록하세요. ‘쉬운 부분부터’는 나중에 무엇을 했는지 확인하기 어렵습니다. 첫 기준점을 맞춘 뒤 그 주변으로 확장했는지도 함께 적으면 전략을 반복할 수 있습니다.'],
+      ['3. 원본을 본 이유만 표시합니다', '원본을 열 때마다 횟수를 세기보다 이유를 짧게 적습니다. ‘수평선 높이’, ‘여우 다리 간격’, ‘케이크 앞뒤 장식’처럼 기록하면 자주 놓치는 단서 유형이 보입니다. 원본을 적게 보는 것이 목표가 아니라, 같은 이유로 반복해서 막히는지를 확인하는 과정입니다.'],
+      ['4. 마지막에 남은 영역을 비교합니다', '완성 직전까지 남은 조각은 사진의 어려운 부분을 보여줍니다. 호수의 회색 산과 반사, 숲의 초록 잎, 케이크의 반복 크림처럼 마지막 영역을 기록하세요. 다음 판에서는 그 영역을 초반에 처리해 남은 조각이 달라지는지 확인합니다.'],
+      ['5. 이동 횟수는 같은 모드 안에서만 참고합니다', '정사각형 교환은 두 조각의 교환을 한 번으로 세고, 직소 모드는 틀린 배치 시도도 이동에 포함합니다. 두 모드의 숫자를 직접 비교하지 마세요. 이 기록은 능력을 평가하기 위한 점수가 아니라 자신에게 유용한 시각 단서를 찾기 위한 메모입니다.'],
+    ] },
+    en: { title: 'A simple record for comparing two sessions', summary: 'Track the starting anchor, reference checks, and last unresolved area instead of treating completion time as the only result.', sections: [
+      ['1. Hold photo, mode, and count constant', 'Change one condition at a time. Play Mountain lake at 48-piece Square swap twice, beginning with the cabin in one session and the shoreline in the other. Changing the image and count at the same time hides which choice mattered.'],
+      ['2. Write one precise starting anchor', 'Use “cabin roof first” or “longest foam curve first,” not “easy part first.” Note whether you expanded from that anchor after placing it. A concrete phrase makes the strategy repeatable.'],
+      ['3. Record why you opened the original', 'Instead of chasing the lowest number of checks, note the reason: “shoreline height,” “spacing between fox legs,” or “front and back cake decorations.” Repeated reasons reveal the clue type you tend to miss.'],
+      ['4. Compare the last unresolved region', 'Tiles left near the end reveal the difficult part: gray mountain and reflection, repeated leaves, or similar cream swirls. In the next session, address that region early and see whether a different area remains.'],
+      ['5. Compare move counts only within one mode', 'Square swap counts exchanges; Shape fit includes incorrect placement attempts. Do not compare those totals directly. This record is not a score of ability; it is a way to find visual evidence that works for you.'],
+    ] },
+  },
 ] as const;

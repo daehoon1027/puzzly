@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Script from 'next/script';
 import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
 
@@ -9,8 +8,9 @@ export const metadata: Metadata = {
   description: '검색어로 원하는 사진을 고르고 12~400피스의 정사각형 또는 직소 방식으로 바로 즐기는 무료 온라인 사진 퍼즐 만들기입니다.',
   keywords: ['사진 퍼즐 만들기', '무료 온라인 직소 퍼즐', '온라인 사진 퍼즐', '이미지 퍼즐', '그림 퍼즐', '웹 퍼즐 게임'],
   category: 'games',
-  creator: '퍼즐리 운영팀',
+  creator: 'daehoon1027',
   publisher: '퍼즐리',
+  icons: { icon: '/favicon.svg' },
   verification: {
     google: 'yTLrFM2hXncQubi1SsP-xC26mOqABnXJAimyqo2u_3c',
     other: { 'naver-site-verification': 'c6c5317e6fed3e54410dfbfc6ac44cf53ba58f28' },
@@ -37,6 +37,7 @@ const structuredData = {
       alternateName: 'Puzzly',
       description: '검색어로 사진을 찾아 원하는 조각 수와 방식으로 즐기는 무료 온라인 사진 퍼즐 만들기',
       inLanguage: 'ko-KR',
+      creator: { '@id': 'https://puzzly-one.vercel.app/#creator' },
     },
     {
       '@type': 'WebApplication',
@@ -52,10 +53,19 @@ const structuredData = {
       inLanguage: 'ko-KR',
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'KRW' },
+      creator: { '@id': 'https://puzzly-one.vercel.app/#creator' },
+    },
+    {
+      '@type': 'Person',
+      '@id': 'https://puzzly-one.vercel.app/#creator',
+      name: 'daehoon1027',
+      jobTitle: '퍼즐리 제작자·편집자',
+      url: 'https://puzzly-one.vercel.app/editorial',
+      sameAs: ['https://github.com/daehoon1027'],
     },
   ],
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="ko"><head><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} /></head><body>{children}<Analytics /><Script id="adsense-loader" async crossOrigin="anonymous" strategy="afterInteractive" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4917350716922728" /></body></html>;
+  return <html lang="ko"><head><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} /><script async crossOrigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4917350716922728" /></head><body>{children}<Analytics /></body></html>;
 }

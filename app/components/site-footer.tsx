@@ -17,6 +17,7 @@ export function SiteFooter({ locale }: { locale: 'ko' | 'en' }) {
         <Link href={isEnglish ? '/en/collections' : '/collections'}>{isEnglish ? 'Collections' : '테마별 퍼즐'}</Link>
         <Link href={isEnglish ? '/en/guide' : '/guide'}>{isEnglish ? 'Puzzle guide' : '퍼즐 가이드'}</Link>
         <Link href={isEnglish ? '/en/about' : '/about'}>{isEnglish ? 'About' : '서비스 소개'}</Link>
+        <Link href={isEnglish ? '/en/editorial' : '/editorial'}>{isEnglish ? 'Editorial process' : '작성·검증 원칙'}</Link>
         <Link href={isEnglish ? '/en/privacy' : '/privacy'}>{isEnglish ? 'Privacy' : '개인정보처리방침'}</Link>
         <Link href={isEnglish ? '/en/terms' : '/terms'}>{isEnglish ? 'Terms' : '이용약관'}</Link>
         <Link href={isEnglish ? '/en/contact' : '/contact'}>{isEnglish ? 'Contact' : '문의하기'}</Link>

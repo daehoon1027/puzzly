@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: { absolute: 'Make a Photo Puzzle Online | Free Jigsaw Game - Puzzly' },
   description: 'Search for a photo and make a free 12 to 400 piece online puzzle. Choose square swap or jigsaw mode and play instantly in your browser.',
   keywords: ['make a photo puzzle online', 'free online jigsaw puzzle', 'photo puzzle', 'jigsaw puzzle game', 'image puzzle'],
-  creator: 'Puzzly team',
+  creator: 'daehoon1027',
   publisher: 'Puzzly',
   alternates: {
     canonical: '/en',

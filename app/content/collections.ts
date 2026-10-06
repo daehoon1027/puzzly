@@ -88,6 +88,93 @@ export const collections: { slug: string; photoId: string; pieces: number; ko: C
       challenge: 'Compare 20, 48, and 120 pieces with this same photo. At 20, use building groups; at 48, use roofs; at 120, inspect walls and shadow boundaries. If your screen makes the windows too small to distinguish, reducing the count gives you a more useful exercise.',
     },
   },
+  {
+    slug: 'sunset-beach', photoId: '1507525428034-b723cf961d3e', pieces: 30,
+    ko: {
+      title: '해 질 무렵 해변: 수평선과 파도 결 따라가기',
+      summary: '곧은 수평선, 굽은 포말, 모래 위의 빛을 서로 다른 선으로 읽는 30피스 퍼즐입니다.',
+      alt: '노을빛 하늘 아래 청록색 바다와 굽은 흰 파도, 젖은 모래 위로 이어지는 반사',
+      why: '이 사진은 하늘·바다·모래가 큰 층으로 나뉘어 처음 분류하기 쉽지만, 경계의 성격은 서로 다릅니다. 수평선은 곧고, 해안의 포말은 화면 아래를 향해 굽으며, 햇빛의 반사는 세로로 길게 이어집니다. 30피스에서는 이 세 방향을 한 조각 안에서 비교할 수 있어 색보다 선을 먼저 읽는 연습에 알맞습니다. 왼쪽의 작은 육지는 단색 영역 사이에서 위치를 확정하는 보조 기준점이 됩니다.',
+      clues: [
+        ['가장 곧은 수평선', '하늘과 바다가 만나는 선은 사진 전체에서 가장 길고 곧습니다. 위쪽은 옅은 파랑과 구름, 아래쪽은 청록색 물결이므로 선의 양쪽 질감까지 함께 확인하세요. 수평선 조각을 먼저 한 줄로 모으면 위아래 후보가 크게 줄어듭니다.'],
+        ['아래로 굽는 흰 포말', '파도 가장자리의 흰 선은 왼쪽에서 시작해 화면 아래 중앙으로 휘어집니다. 흰색만 맞추지 말고 곡선이 어느 방향으로 꺾이는지 보세요. 포말 바깥쪽은 매끈한 젖은 모래이고 안쪽은 잔물결이 있는 바다입니다.'],
+        ['노을빛이 만드는 세로 길', '해는 왼쪽 수평선 가까이에 있고 밝은 반사는 바다와 모래 위로 세로 방향으로 이어집니다. 노란빛 조각을 무조건 하늘에 두지 말고 물결이나 모래의 가는 선이 함께 보이는지 확인하세요.'],
+      ],
+      trap: '하늘의 분홍빛과 젖은 모래의 분홍빛은 색만 보면 비슷합니다. 하늘에는 부드러운 구름 덩어리가 있고 모래에는 가늘고 평행한 물결 자국이 있습니다. 오른쪽 바다는 색 변화가 작으므로 처음부터 그 영역을 무작위로 바꾸기보다 수평선과 포말을 완성한 뒤 남은 위치로 좁히세요.',
+      challenge: '20피스에서는 하늘·바다·모래의 세 층을 먼저 나누고, 48피스에서는 포말의 굴곡과 잔물결 방향을 따라가 보세요. 같은 사진에서 원본을 몇 번 확인했는지 손으로 기록하면 큰 색 영역과 가는 선 중 어느 단서에 더 의존하는지 알 수 있습니다.',
+    },
+    en: {
+      title: 'Sunset beach: follow the horizon and foam',
+      summary: 'Read a straight horizon, curved foam, and reflected light as three different kinds of line.',
+      alt: 'Turquoise sea beneath a sunset sky, curved white foam, and warm light reflected across wet sand',
+      why: 'Sky, sea, and sand form three broad layers, but each boundary behaves differently. The horizon is straight, the foam curves toward the bottom of the frame, and the reflection stretches vertically. At 30 pieces, enough of each direction remains inside a tile to practise reading line before color. The small strip of land on the left provides a secondary anchor among the broad areas.',
+      clues: [
+        ['The straight horizon', 'The line between sky and sea is the longest straight boundary in the photograph. Pale sky and clouds sit above it, while turquoise ripples sit below. Build this row first to eliminate many wrong upper and lower positions.'],
+        ['The curve of white foam', 'The foam begins on the left and bends toward the lower middle. Match the direction of the curve, not only its white color. Smooth wet sand lies outside the curve and textured water lies inside it.'],
+        ['The vertical path of reflected light', 'The sun is low on the left, and its reflection runs through water and sand. A warm yellow tile does not automatically belong in the sky: check for ripples or fine sand lines within it.'],
+      ],
+      trap: 'Pink sky and warm wet sand can look alike by color. Clouds form soft masses, while sand carries fine parallel marks. Leave the low-detail water on the right until the horizon and foam have narrowed its possible positions.',
+      challenge: 'Use 20 pieces to separate the three broad layers, then try 48 and follow individual bends in the foam. Make a simple tally whenever you open the original; it reveals whether broad color or narrow lines give you the stronger clue.',
+    },
+  },
+  {
+    slug: 'snow-fox', photoId: '1474511320723-9a56873867b5', pieces: 30,
+    ko: {
+      title: '눈밭의 붉은 여우: 윤곽과 색 대비 찾기',
+      summary: '귀와 얼굴의 작은 형태에서 시작해 붉은 몸통, 검은 다리, 푸른 눈밭을 연결하는 동물 퍼즐입니다.',
+      alt: '푸른빛 눈밭에 서 있는 붉은 여우와 검은 다리, 밝은 가슴 털',
+      why: '중앙의 여우는 따뜻한 주황색이고 배경은 차가운 청회색이라 큰 분류가 명확합니다. 그러나 몸통은 털결 변화가 작고 배경은 초점이 흐려, 조각 수가 늘면 단색처럼 보이는 후보가 생깁니다. 30피스에서는 귀·눈·코처럼 작은 형태와 등·배·다리의 큰 윤곽을 함께 사용할 수 있습니다. 인물이나 동물 사진에서 얼굴만 찾은 뒤 막히는 상황을 연습하기 좋은 사진입니다.',
+      clues: [
+        ['두 귀와 눈 사이의 삼각형', '귀 끝의 검은 부분과 두 눈, 코가 만드는 삼각형은 가장 구별하기 쉬운 기준점입니다. 얼굴 조각을 맞춘 뒤 귀 바깥쪽이 배경과 만나는 선을 따라 머리의 위치를 확정하세요.'],
+        ['주황색 등과 흰 가슴의 경계', '등은 오른쪽으로 거의 수평에 가깝게 이어지고, 목 아래의 흰 털은 불규칙하게 퍼집니다. 밝은 털이라고 모두 눈밭은 아닙니다. 털 끝이 가늘게 갈라지는지, 배경처럼 매끈하게 흐려지는지 비교하세요.'],
+        ['검은 다리와 눈밭의 접점', '앞다리 두 개와 뒤쪽 다리는 서로 간격이 다릅니다. 검은 세로선 아래에서 눈이 가려지는 위치를 확인하면 다리의 순서를 정할 수 있습니다. 다리 사이로 보이는 푸른 배경도 중요한 모양입니다.'],
+      ],
+      trap: '몸통 중앙의 주황색 조각은 털결만으로 좌우를 구분하기 어렵습니다. 먼저 등의 위쪽 선과 배 아래의 어두운 경계를 완성한 뒤 그 사이를 채우세요. 흐린 배경 조각은 선명도가 낮다는 이유로 같은 위치가 아니며, 왼쪽 위의 밝은 회색과 오른쪽의 푸른 회색은 색온도가 다릅니다.',
+      challenge: '30피스에서는 얼굴에서 바깥쪽으로 확장하고, 48피스에서는 다리와 배경이 만드는 빈 공간부터 맞춰보세요. 완성 뒤 어떤 순서에서 몸통의 단색 조각이 덜 남았는지 비교하면 인물·동물 퍼즐의 효율적인 출발점을 찾을 수 있습니다.',
+    },
+    en: {
+      title: 'Red fox on snow: trace silhouette and contrast',
+      summary: 'Begin with ears and face, then connect the orange body, dark legs, pale chest, and blue snow.',
+      alt: 'Red fox standing on blue snow with dark legs and a pale chest',
+      why: 'The fox is warm orange against a cool blue-gray background, so the first separation is clear. As the count rises, the body has few large changes and the background is deliberately soft. Thirty pieces preserve both small landmarks such as ears and eyes and the larger outline of back, belly, and legs. It is a useful study of what to do after an animal face is complete.',
+      clues: [
+        ['The triangle between ears, eyes, and nose', 'Dark ear tips, two eyes, and the nose make the most distinctive anchor. Complete the face, then follow the edge where the ears meet the background to confirm its position.'],
+        ['Orange back against the pale chest', 'The back runs almost horizontally to the right, while pale chest fur breaks into an irregular edge below the neck. A bright patch may be fur rather than snow; compare fine hair edges with the smooth blurred background.'],
+        ['Dark legs meeting the snow', 'The two front legs and rear leg have different spacing. Check where each dark vertical shape hides the snow. The blue negative spaces between the legs are clues, not empty detail.'],
+      ],
+      trap: 'Orange body tiles are hard to order by fur texture alone. Complete the upper back and darker belly edge, then fill the space between them. Soft background tiles are not interchangeable: the upper left is lighter gray while the right side shifts toward deeper blue.',
+      challenge: 'At 30 pieces, work outward from the face. At 48, start with the negative spaces around the legs. Compare which route leaves fewer plain body tiles unresolved near the end.',
+    },
+  },
+  {
+    slug: 'chocolate-cake', photoId: '1578985545062-69928b1d9587', pieces: 48,
+    ko: {
+      title: '초콜릿 케이크: 반복 장식과 흐르는 선 구분하기',
+      summary: '둥근 윗면, 반복되는 크림, 길이가 다른 초콜릿 방울을 비교하는 48피스 정물 퍼즐입니다.',
+      alt: '둥근 초콜릿 케이크 위의 반복 크림 장식과 옆면을 따라 흐르는 초콜릿, 흰 케이크 받침',
+      why: '정물 사진은 배경이 단순해 쉬워 보이지만, 이 케이크의 크림 장식과 초콜릿 방울은 비슷한 형태가 반복됩니다. 큰 원형 윤곽과 밝은 받침은 위치를 잡아주고, 작은 장식은 세부 비교를 요구합니다. 48피스에서는 같은 갈색 안에서도 광택·회전 방향·방울 길이를 읽을 수 있어 반복 무늬를 다루는 연습에 적합합니다.',
+      clues: [
+        ['윗면의 타원형 가장자리', '원형 케이크는 화면에서 타원처럼 보입니다. 윗면의 짙고 반짝이는 초콜릿과 옆면의 밝은 갈색이 만나는 곡선을 먼저 찾으세요. 이 곡선은 장식 조각의 위아래를 결정하는 기준선입니다.'],
+        ['크림 장식의 회전 방향', '각 크림은 비슷하지만 주름이 감기는 방향과 그림자가 다릅니다. 위쪽 뒤편의 장식은 작고 일부가 가려지며, 앞쪽은 더 크고 선명합니다. 크기와 선명도를 함께 보면 앞뒤 위치를 나눌 수 있습니다.'],
+        ['길이가 다른 초콜릿 방울', '옆면의 짙은 초콜릿은 아래로 흐르는 길이가 모두 다릅니다. 방울 끝의 높이와 옆 방울 사이의 간격을 비교하세요. 갈색 면적보다 검은 세로선의 순서를 기억하는 편이 정확합니다.'],
+      ],
+      trap: '크림 하나가 완전하게 보인다고 사진 위쪽에 있는 것은 아닙니다. 앞쪽 장식도 완전한 형태로 보입니다. 장식 아래가 케이크 윗면인지 옆면인지 확인하고, 배경의 밝은 타일과 흰 받침 타일은 무늬와 초점 차이로 구분하세요.',
+      challenge: '20피스에서는 케이크의 전체 윤곽을, 48피스에서는 방울 길이를, 80피스에서는 크림 주름과 초콜릿 토핑의 방향을 기준으로 삼아보세요. 같은 정물에서 반복이 어느 조각 수부터 부담이 되는지 직접 비교할 수 있습니다.',
+    },
+    en: {
+      title: 'Chocolate cake: separate repetition from flow',
+      summary: 'Compare the oval top, repeating cream swirls, and chocolate drips of different lengths.',
+      alt: 'Round chocolate cake with repeating cream swirls, chocolate drips, and a white cake stand',
+      why: 'The plain background makes this still life look easy, but cream swirls and chocolate drips repeat across the cake. The large circular outline and bright stand establish position while small decorations demand closer comparison. At 48 pieces, gloss, rotation, and drip length remain visible enough to practise handling repetition within one color family.',
+      clues: [
+        ['The oval rim of the top', 'A circular cake appears as an oval from this angle. Find the curve where the dark glossy top meets the lighter side. This line establishes whether each decoration sits above or below the rim.'],
+        ['The direction of each cream swirl', 'The swirls look similar, but their folds and shadows turn differently. Decorations at the back appear smaller and partly hidden; front swirls are larger and sharper. Use both size and focus to separate rows.'],
+        ['Chocolate drips of different lengths', 'Each dark drip ends at a different height. Compare its endpoint and the gap to neighboring drips. Remembering the order of dark vertical lines is more reliable than matching a broad brown area.'],
+      ],
+      trap: 'A complete cream swirl is not automatically in the back row; front decorations can also be fully visible. Check whether the area below it is the top or side of the cake. Separate pale background from the white stand by pattern and focus.',
+      challenge: 'Use the overall silhouette at 20 pieces, drip length at 48, and the direction of cream folds and sprinkles at 80. The same still life reveals when repetition becomes more demanding for you.',
+    },
+  },
 ];
 
 export function collectionPhoto(item: typeof collections[number], locale: Language) {

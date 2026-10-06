@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: { absolute: 'Contact Puzzly | Puzzly' },
   description: 'Contact Puzzly about bugs, image rights, privacy, or product feedback.',
   keywords: ['contact Puzzly', 'puzzle support', 'photo puzzle feedback'],
-  creator: 'Puzzly team',
+  creator: 'daehoon1027',
   publisher: 'Puzzly',
   alternates: { canonical: '/en/contact', languages: { 'ko-KR': '/contact', 'en-US': '/en/contact' } },
   openGraph: { type: 'website', locale: 'en_US', siteName: 'Puzzly', title: 'Contact Puzzly | Puzzly', description: 'Contact Puzzly about bugs, image rights, privacy, or product feedback.', url: '/en/contact', images: [{ url: '/og.png', width: 1200, height: 630, alt: 'Contact Puzzly' }] },
@@ -17,5 +17,6 @@ export default function EnglishContactPage() {
     <section><h2>How to contact us</h2><p>Send us an email using the button below. Your default mail app will open with a subject already filled in.</p><p><a className="contact-button" href="mailto:daehoon1027@gmail.com?subject=Puzzly%20contact">Email Puzzly →</a></p><p>Contact email: <a href="mailto:daehoon1027@gmail.com">daehoon1027@gmail.com</a></p></section>
     <section><h2>What to include for a faster reply</h2><ul><li>The page where the issue occurred and the puzzle version you selected</li><li>Piece count, search term, device, and browser</li><li>The steps that reproduce the issue and a screenshot if possible</li></ul><p>Please do not include sensitive personal information such as national ID numbers or financial details.</p></section>
     <section><h2>Contact topics</h2><div className="text-grid"><div><h3>Features and bugs</h3><p>Tell us if pieces do not move, images fail to load, or an accessibility improvement would help.</p></div><div><h3>Content and rights</h3><p>For image source, copyright, or inappropriate-image requests, include the image and search term.</p></div><div><h3>Privacy</h3><p>We can answer questions about cookies, external service requests, and the privacy policy.</p></div></div></section>
+    <section><h2>Operation and replies</h2><p>Puzzly creator daehoon1027 reviews feature, content, and rights requests. For a correction to a photograph description or guide, include the page URL and verifiable evidence. See the <a href="/en/editorial">editorial and testing process</a> for how changes are reviewed.</p></section>
   </InfoPage>;
 }
