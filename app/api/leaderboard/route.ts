@@ -25,12 +25,13 @@ export async function GET(request: NextRequest) {
   const mode = request.nextUrl.searchParams.get('mode');
   const pieceCount = Number(request.nextUrl.searchParams.get('pieces'));
   const visitorId = request.nextUrl.searchParams.get('visitor') ?? '';
+  const photoId = cleanText(request.nextUrl.searchParams.get('photo'), 120);
   if (!isValidMode(mode) || !isValidPieceCount(pieceCount)) return json({ error: 'Invalid leaderboard filter.' }, 400);
 
   try {
     await ensureLeaderboardSchema();
     const currentVisitorId = isValidVisitorId(visitorId) ? hashVisitorId(visitorId) : '';
-    return json(await getRanking(mode, pieceCount, currentVisitorId));
+    return json(await getRanking(mode, pieceCount, currentVisitorId, photoId));
   } catch (error) {
     console.error('Leaderboard read failed', error instanceof Error ? error.message : 'unknown error');
     return json({ error: 'Leaderboard is temporarily unavailable.' }, 503);
@@ -96,8 +97,8 @@ export async function POST(request: NextRequest) {
           AND visitor_id = ${visitorId}
           AND completed_at IS NULL
           AND started_at > now() - interval '1 day'
-        RETURNING mode, piece_count, elapsed_ms
-      ` as Array<{ mode: 'classic' | 'shape'; piece_count: number; elapsed_ms: number | string }>;
+        RETURNING mode, piece_count, photo_id, elapsed_ms
+      ` as Array<{ mode: 'classic' | 'shape'; piece_count: number; photo_id: string; elapsed_ms: number | string }>;
       if (!rows.length) return json({ error: 'This puzzle run is no longer valid.' }, 409);
 
       const elapsedMs = Number(rows[0].elapsed_ms);
@@ -106,7 +107,7 @@ export async function POST(request: NextRequest) {
         return json({ error: 'Completion time is outside the valid range.' }, 400);
       }
 
-      const ranking = await getRanking(rows[0].mode, Number(rows[0].piece_count), visitorId);
+      const ranking = await getRanking(rows[0].mode, Number(rows[0].piece_count), visitorId, rows[0].photo_id);
       return json({ ...ranking, submittedElapsedMs: elapsedMs });
     }
 

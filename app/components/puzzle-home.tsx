@@ -321,6 +321,7 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
   const activePieceCount = pieces && activeRun ? activeRun.pieceCount : pieceCount;
   const rankingMode = activeRun?.mode ?? mode;
   const rankingPieceCount = activeRun?.pieceCount ?? pieceCount;
+  const rankingPhoto = activePhoto ?? selectedPhoto;
   const { rows: gridRows, columns: gridColumns } = gridDimensions(activePieceCount);
   const progress = useMemo(() => {
     if (!pieces) return 0;
@@ -371,10 +372,10 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
   }, []);
 
   useEffect(() => {
-    if (!visitorId) return;
+    if (!visitorId || !rankingPhoto) return;
     let active = true;
     const controller = new AbortController();
-    fetch(`/api/leaderboard?mode=${rankingMode}&pieces=${rankingPieceCount}&visitor=${encodeURIComponent(visitorId)}`, { signal: controller.signal, cache: 'no-store' })
+    fetch(`/api/leaderboard?mode=${rankingMode}&pieces=${rankingPieceCount}&photo=${encodeURIComponent(rankingPhoto.id)}&visitor=${encodeURIComponent(visitorId)}`, { signal: controller.signal, cache: 'no-store' })
       .then(async (response) => {
         if (!response.ok) throw new Error('leaderboard unavailable');
         return response.json() as Promise<LeaderboardData>;
@@ -393,7 +394,7 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
       active = false;
       controller.abort();
     };
-  }, [rankingMode, rankingPieceCount, visitorId]);
+  }, [rankingMode, rankingPieceCount, rankingPhoto, visitorId]);
 
   useEffect(() => {
     if (!activeRun || completed) return;
@@ -554,7 +555,7 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
           </div>
           <button className="quickplay-start" onClick={() => void startPuzzle(20, 'classic')} disabled={busy || startingPuzzle || !selectedPhoto}>{startingPuzzle ? t.startPreparing : busy ? t.searching : t.quickStartButton}<span>→</span></button>
           <aside className="hero-ranking" aria-label={t.leaderboardTitle(rankingPieceCount, rankingMode)}>
-            <div><span>BEST RECORD</span><b>{t.leaderboardTitle(rankingPieceCount, rankingMode)}</b></div>
+            <div><span>BEST RECORD</span><b>{rankingPhoto?.label} · {t.leaderboardTitle(rankingPieceCount, rankingMode)}</b></div>
             {leaderboardState === 'loading' ? <small role="status">{t.leaderboardLoading}</small>
               : leaderboardState === 'error' ? <small className="error" role="status">{t.leaderboardError}</small>
               : leaderboard?.entries[0] ? <div className="hero-ranking-record"><strong>1</strong><span>{t.participant(leaderboard.entries[0].visitorCode)}<small>{leaderboard.entries[0].photoLabel}</small></span><b>{formatElapsed(leaderboard.entries[0].elapsedMs)}</b></div>

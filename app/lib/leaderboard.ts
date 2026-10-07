@@ -84,7 +84,7 @@ export type LeaderboardEntry = {
   isCurrent: boolean;
 };
 
-export async function getRanking(mode: LeaderboardMode, pieceCount: number, currentVisitorId = '') {
+export async function getRanking(mode: LeaderboardMode, pieceCount: number, currentVisitorId = '', photoId = '') {
   const sql = getLeaderboardSql();
   const rows = await sql`
     WITH best AS (
@@ -93,6 +93,7 @@ export async function getRanking(mode: LeaderboardMode, pieceCount: number, curr
       FROM puzzle_runs
       WHERE mode = ${mode}
         AND piece_count = ${pieceCount}
+        AND (${photoId} = '' OR photo_id = ${photoId})
         AND completed_at IS NOT NULL
         AND elapsed_ms BETWEEN 2000 AND 86400000
       ORDER BY visitor_id, elapsed_ms ASC, completed_at ASC
