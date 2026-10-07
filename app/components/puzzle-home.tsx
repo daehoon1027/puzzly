@@ -11,7 +11,7 @@ type Photo = { id: string; url: string; label: string; labelEn?: string; credit:
 type PuzzleMode = 'classic' | 'shape';
 type LeaderboardEntry = { rank: number; visitorCode: string; elapsedMs: number; moves: number; photoLabel: string; completedAt: string; isCurrent: boolean };
 type LeaderboardData = { entries: LeaderboardEntry[]; current: LeaderboardEntry | null; total: number };
-type ActiveRun = { runId: string | null; visitorId: string; startedAt: number };
+type ActiveRun = { runId: string | null; visitorId: string; startedAt: number; mode: PuzzleMode; pieceCount: number };
 type RankResult = { status: 'idle' | 'saving' | 'saved' | 'error'; elapsedMs?: number; rank?: number; total?: number; bestElapsedMs?: number };
 
 const photoSets: Record<string, Photo[]> = {
@@ -65,7 +65,7 @@ const uiCopy = {
     completeTitle: '멋지게 완성했어요!', classicTitle: '정사각형 조각을 맞춰보세요', shapeTitle: '모양을 보고 빈자리에 끼워보세요', completeText: (moves: number) => `${moves}번의 이동으로 퍼즐을 완성했습니다.`,
     classicHelp: '옮길 조각과 자리를 차례로 눌러 서로 바꿔보세요.', shapeHelp: '오른쪽 조각을 끌어다 같은 모양의 빈 홈에 놓거나, 조각과 홈을 차례로 누르세요.', original: '원본', hide: '숨기기', show: '보기', reshuffle: '다시 섞기',
     progress: '진행률', pieceCount: '조각 수', moveCount: '이동 횟수', timeLabel: '완성 시간', classicTip: '모서리와 테두리 조각부터 맞추면 더 쉬워요.', tray: '조각함', remaining: (count: number) => `${count}개 남음`, dragHelp: '끌어서 왼쪽 홈에 놓으세요', moves: (count: number) => `이동 ${count}회`, shapeTip: '색과 모양을 함께 살펴보세요.',
-    leaderboardTitle: (count: number, mode: PuzzleMode) => `${count}피스 · ${mode === 'classic' ? '정사각형 교환' : '직소 끼우기'} 전체 순위`, leaderboardDescription: '같은 모드와 피스 수를 완성한 익명 참가자의 최고 기록을 빠른 시간순으로 표시합니다.', leaderboardRank: '순위', leaderboardPlayer: '참가자', leaderboardRecord: '기록', leaderboardPhoto: '퍼즐', leaderboardEmpty: '아직 완성 기록이 없습니다. 첫 번째 기록을 만들어보세요.', leaderboardLoading: '순위를 불러오는 중입니다.', leaderboardError: '순위표를 잠시 불러올 수 없습니다.', participant: (code: string) => `참가자 ${code}`, participantCount: (count: number) => `${count}명 참여`, currentBest: '내 최고 기록', savingRank: '전체 순위를 계산하고 있습니다.', rankSaveError: '완성 시간은 확인했지만 전체 순위에는 저장하지 못했습니다.', startPreparing: '기록 준비 중...',
+    leaderboardTitle: (count: number, mode: PuzzleMode) => `${count}피스 · ${mode === 'classic' ? '정사각형 교환' : '직소 끼우기'} 최고 기록`, leaderboardRank: '순위', leaderboardEmpty: '아직 완성 기록이 없습니다.', leaderboardLoading: '최고 기록을 불러오는 중입니다.', leaderboardError: '최고 기록을 잠시 불러올 수 없습니다.', participant: (code: string) => `참가자 ${code}`, currentBest: '내 최고 기록', savingRank: '전체 순위를 계산하고 있습니다.', rankSaveError: '완성 시간은 확인했지만 전체 순위에는 저장하지 못했습니다.', startPreparing: '기록 준비 중...',
     notesTitle: '그림을 고르는 순간부터 퍼즐은 시작됩니다', notesIntro: '퍼즐리는 단순히 조각을 섞는 도구가 아니라, 한 장의 이미지를 색·선·질감으로 다시 읽어보는 공간입니다. 처음에는 큰 색 영역을 찾고, 익숙해지면 작은 굴곡과 반복 무늬까지 관찰해보세요.',
     notes: [
       ['색이 나뉘는 그림부터', '하늘과 땅, 사물과 배경이 뚜렷한 이미지는 조각 위치를 예상하기 쉽습니다. 처음이라면 자연이나 도시 풍경으로 규칙을 익혀보세요.'],
@@ -99,7 +99,7 @@ const uiCopy = {
     completeTitle: 'Beautifully done!', classicTitle: 'Put the square tiles in place', shapeTitle: 'Match each piece to its space', completeText: (moves: number) => `You completed the puzzle in ${moves} moves.`,
     classicHelp: 'Select a tile, then select another position to swap them.', shapeHelp: 'Drag a piece from the tray to its matching space, or select the piece and then the space.', original: 'Original', hide: 'Hide', show: 'Show', reshuffle: 'Shuffle again',
     progress: 'Progress', pieceCount: 'Pieces', moveCount: 'Moves', timeLabel: 'Finish time', classicTip: 'Start with corners, borders, and strong color boundaries.', tray: 'Piece tray', remaining: (count: number) => `${count} left`, dragHelp: 'Drag pieces into the matching spaces', moves: (count: number) => `${count} moves`, shapeTip: 'Compare both color and shape.',
-    leaderboardTitle: (count: number, mode: PuzzleMode) => `${count} pieces · ${mode === 'classic' ? 'Square swap' : 'Shape fit'} leaderboard`, leaderboardDescription: 'The best result from each anonymous browser is ranked by fastest completion time for the same mode and piece count.', leaderboardRank: 'Rank', leaderboardPlayer: 'Player', leaderboardRecord: 'Time', leaderboardPhoto: 'Puzzle', leaderboardEmpty: 'No completed runs yet. Set the first record.', leaderboardLoading: 'Loading the leaderboard.', leaderboardError: 'The leaderboard is temporarily unavailable.', participant: (code: string) => `Player ${code}`, participantCount: (count: number) => `${count} players`, currentBest: 'My best', savingRank: 'Calculating your overall rank.', rankSaveError: 'Your finish time was measured, but it could not be added to the leaderboard.', startPreparing: 'Preparing record...',
+    leaderboardTitle: (count: number, mode: PuzzleMode) => `${count} pieces · ${mode === 'classic' ? 'Square swap' : 'Shape fit'} best time`, leaderboardRank: 'Rank', leaderboardEmpty: 'No completed run yet.', leaderboardLoading: 'Loading the best time.', leaderboardError: 'The best time is temporarily unavailable.', participant: (code: string) => `Player ${code}`, currentBest: 'My best', savingRank: 'Calculating your overall rank.', rankSaveError: 'Your finish time was measured, but it could not be added to the leaderboard.', startPreparing: 'Preparing record...',
     notesTitle: 'The puzzle begins when you choose the image', notesIntro: 'Puzzly is more than a tool that shuffles pieces. It is a place to rediscover an image through color, line, and texture. Start with broad areas of color, then look for small curves and repeating patterns.',
     notes: [
       ['Start with clear color regions', 'Images with a distinct sky, ground, subject, and background make piece positions easier to predict. Nature and city scenes are excellent places to learn the pattern.'],
@@ -290,6 +290,7 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
   const [searched, setSearched] = useState<string>(initialQuery);
   const [photos, setPhotos] = useState<Photo[]>(() => preset ? [preset] : findPhotos(initialQuery, locale));
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(() => preset ?? findPhotos(initialQuery, locale)[0] ?? null);
+  const [activePhoto, setActivePhoto] = useState<Photo | null>(null);
   const [initialLoading, setInitialLoading] = useState(!preset);
   const [searching, setSearching] = useState(false);
   const [loadingQuery, setLoadingQuery] = useState<string | null>(initialQuery);
@@ -316,12 +317,16 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
   const busy = initialLoading || searching;
   const displayedQuery = loadingQuery ?? searched;
 
-  const { rows: gridRows, columns: gridColumns } = gridDimensions(pieceCount);
+  const activeMode = pieces && activeRun ? activeRun.mode : mode;
+  const activePieceCount = pieces && activeRun ? activeRun.pieceCount : pieceCount;
+  const rankingMode = activeRun?.mode ?? mode;
+  const rankingPieceCount = activeRun?.pieceCount ?? pieceCount;
+  const { rows: gridRows, columns: gridColumns } = gridDimensions(activePieceCount);
   const progress = useMemo(() => {
     if (!pieces) return 0;
-    if (mode === 'shape') return Math.round((placed.length / pieces.length) * 100);
+    if (activeMode === 'shape') return Math.round((placed.length / pieces.length) * 100);
     return Math.round((pieces.filter((piece, index) => piece === index).length / pieces.length) * 100);
-  }, [mode, pieces, placed.length]);
+  }, [activeMode, pieces, placed.length]);
 
   useEffect(() => {
     let active = true;
@@ -369,7 +374,7 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
     if (!visitorId) return;
     let active = true;
     const controller = new AbortController();
-    fetch(`/api/leaderboard?mode=${mode}&pieces=${pieceCount}&visitor=${encodeURIComponent(visitorId)}`, { signal: controller.signal, cache: 'no-store' })
+    fetch(`/api/leaderboard?mode=${rankingMode}&pieces=${rankingPieceCount}&visitor=${encodeURIComponent(visitorId)}`, { signal: controller.signal, cache: 'no-store' })
       .then(async (response) => {
         if (!response.ok) throw new Error('leaderboard unavailable');
         return response.json() as Promise<LeaderboardData>;
@@ -388,7 +393,7 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
       active = false;
       controller.abort();
     };
-  }, [mode, pieceCount, visitorId]);
+  }, [rankingMode, rankingPieceCount, visitorId]);
 
   useEffect(() => {
     if (!activeRun || completed) return;
@@ -430,10 +435,10 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
     }
   }
 
-  async function startPuzzle(count = pieceCount, selectedMode: PuzzleMode = mode) {
-    if (!selectedPhoto) return;
+  async function startPuzzle(count = pieceCount, selectedMode: PuzzleMode = mode, puzzlePhoto = selectedPhoto) {
+    if (!puzzlePhoto) return;
     setStartingPuzzle(true);
-    if (count !== pieceCount || selectedMode !== mode) setLeaderboardState('loading');
+    if (count !== rankingPieceCount || selectedMode !== rankingMode) setLeaderboardState('loading');
     const currentVisitorId = visitorId || createVisitorId();
     if (!visitorId) setVisitorId(currentVisitorId);
     let runId: string | null = null;
@@ -442,7 +447,7 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
       const response = await fetch('/api/leaderboard', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'start', visitorId: currentVisitorId, locale, mode: selectedMode, pieceCount: count, photoId: selectedPhoto.id, photoLabel: selectedPhoto.label }),
+        body: JSON.stringify({ action: 'start', visitorId: currentVisitorId, locale, mode: selectedMode, pieceCount: count, photoId: puzzlePhoto.id, photoLabel: puzzlePhoto.label }),
       });
       if (response.ok) {
         const data = await response.json() as { runId: string; startedAt: string };
@@ -455,6 +460,7 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
     const nextPieces = shuffled(count);
     setMode(selectedMode);
     setPieceCount(count);
+    setActivePhoto(puzzlePhoto);
     setPieces(nextPieces);
     setTrayPieces(nextPieces);
     setPicked(null);
@@ -464,7 +470,7 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
     setMoves(0);
     setCompleted(false);
     setElapsedMs(0);
-    setActiveRun({ runId, visitorId: currentVisitorId, startedAt });
+    setActiveRun({ runId, visitorId: currentVisitorId, startedAt, mode: selectedMode, pieceCount: count });
     setRankResult({ status: 'idle' });
     setStartingPuzzle(false);
     setTimeout(() => document.getElementById('puzzle')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
@@ -499,7 +505,7 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
   }
 
   function selectPiece(index: number) {
-    if (!pieces || completed || mode !== 'classic') return;
+    if (!pieces || completed || activeMode !== 'classic') return;
     if (picked === null) { setPicked(index); return; }
     if (picked === index) { setPicked(null); return; }
     const next = [...pieces];
@@ -525,7 +531,7 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
     setPlaced(nextPlaced);
     setTrayPieces((current) => current.filter((item) => item !== piece));
     setSelectedTrayPiece(null);
-    if (nextPlaced.length === pieceCount) void finishPuzzle(nextMoves);
+    if (nextPlaced.length === activePieceCount) void finishPuzzle(nextMoves);
   }
 
   const Container = embedded ? 'div' : 'main';
@@ -547,6 +553,13 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
             </button>)}
           </div>
           <button className="quickplay-start" onClick={() => void startPuzzle(20, 'classic')} disabled={busy || startingPuzzle || !selectedPhoto}>{startingPuzzle ? t.startPreparing : busy ? t.searching : t.quickStartButton}<span>→</span></button>
+          <aside className="hero-ranking" aria-label={t.leaderboardTitle(rankingPieceCount, rankingMode)}>
+            <div><span>BEST RECORD</span><b>{t.leaderboardTitle(rankingPieceCount, rankingMode)}</b></div>
+            {leaderboardState === 'loading' ? <small role="status">{t.leaderboardLoading}</small>
+              : leaderboardState === 'error' ? <small className="error" role="status">{t.leaderboardError}</small>
+              : leaderboard?.entries[0] ? <div className="hero-ranking-record"><strong>1</strong><span>{t.participant(leaderboard.entries[0].visitorCode)}<small>{leaderboard.entries[0].photoLabel}</small></span><b>{formatElapsed(leaderboard.entries[0].elapsedMs)}</b></div>
+              : <small>{t.leaderboardEmpty}</small>}
+          </aside>
         </div>
 
         <div className="hero-copy">
@@ -596,12 +609,12 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
         <div className="mode-section">
           <div className="setup-copy"><span className="step">02</span><h2>{t.modeTitle}</h2><p>{t.modeDescription}</p></div>
           <div className="mode-picker" role="group" aria-label={t.modeTitle}>
-            <button className={mode === 'classic' ? 'active' : ''} onClick={() => { setMode('classic'); setLeaderboardState('loading'); }} aria-pressed={mode === 'classic'}>
+            <button className={mode === 'classic' ? 'active' : ''} onClick={() => { setMode('classic'); if (!activeRun) setLeaderboardState('loading'); }} aria-pressed={mode === 'classic'}>
               <span className="mode-visual classic-visual"><i/><i/><i/><i/></span>
               <span><b>{t.version1}</b><small>{t.squareSwap}</small></span>
               <em>{mode === 'classic' ? '✓' : ''}</em>
             </button>
-            <button className={mode === 'shape' ? 'active' : ''} onClick={() => { setMode('shape'); setLeaderboardState('loading'); }} aria-pressed={mode === 'shape'}>
+            <button className={mode === 'shape' ? 'active' : ''} onClick={() => { setMode('shape'); if (!activeRun) setLeaderboardState('loading'); }} aria-pressed={mode === 'shape'}>
               <span className="mode-visual shape-visual"><i/><i/><i/></span>
               <span><b>{t.version2}</b><small>{t.shapeFit}</small></span>
               <em>{mode === 'shape' ? '✓' : ''}</em>
@@ -612,39 +625,21 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
         <div className="setup-card">
           <div className="setup-copy"><span className="step">03</span><h2>{t.piecesTitle}</h2><p>{t.piecesDescription}</p></div>
           <div className="difficulty" role="group" aria-label={t.piecesTitle}>
-            {difficulties.map(count => <button key={count} onClick={() => { setPieceCount(count); setLeaderboardState('loading'); }} className={pieceCount === count ? 'active' : ''}><b>{count}</b><span>{t.pieces}</span></button>)}
+            {difficulties.map(count => <button key={count} onClick={() => { setPieceCount(count); if (!activeRun) setLeaderboardState('loading'); }} className={pieceCount === count ? 'active' : ''}><b>{count}</b><span>{t.pieces}</span></button>)}
           </div>
           <button className="start-button" onClick={() => void startPuzzle()} disabled={busy || startingPuzzle || !selectedPhoto}>{startingPuzzle ? t.startPreparing : mode === 'classic' ? t.start1 : t.start2} <span>→</span></button>
         </div>
 
-        <section className="leaderboard" id="leaderboard" aria-labelledby="leaderboard-title">
-          <div className="leaderboard-heading">
-            <div><span>LIVE RANKING</span><h2 id="leaderboard-title">{t.leaderboardTitle(pieceCount, mode)}</h2><p>{t.leaderboardDescription}</p></div>
-            {leaderboardState === 'ready' && <b>{t.participantCount(leaderboard?.total ?? 0)}</b>}
-          </div>
-          {leaderboardState === 'loading' ? <p className="leaderboard-message" role="status">{t.leaderboardLoading}</p>
-            : leaderboardState === 'error' ? <p className="leaderboard-message error" role="status">{t.leaderboardError}</p>
-            : !leaderboard?.entries.length ? <p className="leaderboard-message">{t.leaderboardEmpty}</p>
-            : <div className="leaderboard-table" role="table" aria-label={t.leaderboardTitle(pieceCount, mode)}>
-              <div className="leaderboard-row leaderboard-columns" role="row"><span role="columnheader">{t.leaderboardRank}</span><span role="columnheader">{t.leaderboardPlayer}</span><span role="columnheader">{t.leaderboardRecord}</span><span role="columnheader">{t.leaderboardPhoto}</span></div>
-              {leaderboard.entries.map((entry) => <div className={`leaderboard-row ${entry.isCurrent ? 'current' : ''}`} role="row" key={`${entry.rank}-${entry.visitorCode}`}>
-                <strong role="cell">{entry.rank}</strong><span role="cell">{t.participant(entry.visitorCode)}{entry.isCurrent && <em>{t.currentBest}</em>}</span><b role="cell">{formatElapsed(entry.elapsedMs)}</b><small role="cell">{entry.photoLabel} · {t.moves(entry.moves)}</small>
-              </div>)}
-              {leaderboard.current && leaderboard.current.rank > 10 && <><div className="leaderboard-gap" aria-hidden="true">•••</div><div className="leaderboard-row current" role="row">
-                <strong role="cell">{leaderboard.current.rank}</strong><span role="cell">{t.participant(leaderboard.current.visitorCode)}<em>{t.currentBest}</em></span><b role="cell">{formatElapsed(leaderboard.current.elapsedMs)}</b><small role="cell">{leaderboard.current.photoLabel} · {t.moves(leaderboard.current.moves)}</small>
-              </div></>}
-            </div>}
-        </section>
       </section>
 
-      {pieces && selectedPhoto && <section className="puzzle-section" id="puzzle">
+      {pieces && activePhoto && <section className="puzzle-section" id="puzzle">
         <div className="puzzle-top">
           <div>
-            <span className="step light">{mode === 'classic' ? 'VER.1' : 'VER.2'}</span>
-            <h2>{completed ? t.completeTitle : mode === 'classic' ? t.classicTitle : t.shapeTitle}</h2>
-            <p>{completed ? t.completeText(moves) : mode === 'classic' ? t.classicHelp : t.shapeHelp}</p>
+            <span className="step light">{activeMode === 'classic' ? 'VER.1' : 'VER.2'}</span>
+            <h2>{completed ? t.completeTitle : activeMode === 'classic' ? t.classicTitle : t.shapeTitle}</h2>
+            <p>{completed ? t.completeText(moves) : activeMode === 'classic' ? t.classicHelp : t.shapeHelp}</p>
           </div>
-          <div className="puzzle-actions"><span className="puzzle-timer"><small>{t.timeLabel}</small><b>{formatElapsed(elapsedMs)}</b></span><button onClick={() => setShowReference(!showReference)}>◉ {t.original} {showReference ? t.hide : t.show}</button><button onClick={() => void startPuzzle()} disabled={startingPuzzle}>↻ {t.reshuffle}</button></div>
+          <div className="puzzle-actions"><span className="puzzle-timer"><small>{t.timeLabel}</small><b>{formatElapsed(elapsedMs)}</b></span><button onClick={() => setShowReference(!showReference)}>◉ {t.original} {showReference ? t.hide : t.show}</button><button onClick={() => void startPuzzle(activePieceCount, activeMode, activePhoto)} disabled={startingPuzzle}>↻ {t.reshuffle}</button></div>
         </div>
 
         {completed && <div className={`completion-ranking ${rankResult.status}`} role="status" aria-live="polite">
@@ -654,20 +649,20 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
           <div>{rankResult.status === 'saving' ? t.savingRank : rankResult.status === 'error' ? t.rankSaveError : rankResult.status === 'saved' && rankResult.bestElapsedMs && rankResult.bestElapsedMs < (rankResult.elapsedMs ?? 0) ? `${t.currentBest}: ${formatElapsed(rankResult.bestElapsedMs)}` : t.currentBest}</div>
         </div>}
 
-        {mode === 'classic' ? <div className="game-layout">
+        {activeMode === 'classic' ? <div className="game-layout">
           <div className="board-wrap">
             <div className={`puzzle-board ${completed ? 'complete' : ''}`} style={{ gridTemplateColumns: `repeat(${gridColumns}, 1fr)`, gridTemplateRows: `repeat(${gridRows}, 1fr)` }}>
               {pieces.map((piece, index) => {
                 const row = Math.floor(piece / gridColumns);
                 const col = piece % gridColumns;
-                return <button key={index} aria-label={isEnglish ? `Puzzle tile at position ${index + 1}` : `${index + 1}번 자리의 퍼즐 조각`} className={`puzzle-piece ${picked === index ? 'picked' : ''}`} onClick={() => selectPiece(index)} style={{ backgroundImage: `url(${selectedPhoto.url})`, backgroundSize: `${gridColumns * 100}% ${gridRows * 100}%`, backgroundPosition: `${gridColumns === 1 ? 0 : (col / (gridColumns - 1)) * 100}% ${gridRows === 1 ? 0 : (row / (gridRows - 1)) * 100}%` }} />;
+                return <button key={index} aria-label={isEnglish ? `Puzzle tile at position ${index + 1}` : `${index + 1}번 자리의 퍼즐 조각`} className={`puzzle-piece ${picked === index ? 'picked' : ''}`} onClick={() => selectPiece(index)} style={{ backgroundImage: `url(${activePhoto.url})`, backgroundSize: `${gridColumns * 100}% ${gridRows * 100}%`, backgroundPosition: `${gridColumns === 1 ? 0 : (col / (gridColumns - 1)) * 100}% ${gridRows === 1 ? 0 : (row / (gridRows - 1)) * 100}%` }} />;
               })}
             </div>
-            {showReference && <div className="reference"><Image src={selectedPhoto.url} alt={`${t.original}: ${selectedPhoto.label}`} width={180} height={135} sizes="180px" /><span>{t.original}</span></div>}
+            {showReference && <div className="reference"><Image src={activePhoto.url} alt={`${t.original}: ${activePhoto.label}`} width={180} height={135} sizes="180px" /><span>{t.original}</span></div>}
           </div>
           <aside className="game-info">
             <div className="stat"><span>{t.progress}</span><b>{progress}%</b><div><i style={{ width: `${progress}%` }} /></div></div>
-            <div className="mini-stats"><p><span>{t.pieceCount}</span><b>{pieceCount}</b></p><p><span>{t.moveCount}</span><b>{moves}</b></p></div>
+            <div className="mini-stats"><p><span>{t.pieceCount}</span><b>{activePieceCount}</b></p><p><span>{t.moveCount}</span><b>{moves}</b></p></div>
             <div className="tip"><span>TIP</span><p>{t.classicTip}</p></div>
           </aside>
         </div> : <div className="shape-game-layout">
@@ -687,7 +682,7 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
                     piece={slot}
                     rows={gridRows}
                     columns={gridColumns}
-                    imageUrl={selectedPhoto.url}
+                    imageUrl={activePhoto.url}
                     showImage={isPlaced}
                     variant="slot"
                     className={isPlaced ? 'placed-shape' : 'hole-shape'}
@@ -695,13 +690,13 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
                 </button>;
               })}
             </div>
-            {showReference && <div className="reference"><Image src={selectedPhoto.url} alt={`${t.original}: ${selectedPhoto.label}`} width={180} height={135} sizes="180px" /><span>{t.original}</span></div>}
+            {showReference && <div className="reference"><Image src={activePhoto.url} alt={`${t.original}: ${activePhoto.label}`} width={180} height={135} sizes="180px" /><span>{t.original}</span></div>}
           </div>
 
           <aside className="piece-tray">
             <div className="tray-heading"><div><span>{t.tray}</span><b aria-live="polite">{t.remaining(trayPieces.length)}</b></div><small>{t.dragHelp}</small></div>
             <div className="tray-progress"><i style={{ width: `${progress}%` }}/><span>{progress}%</span></div>
-            <div className={`tray-grid tray-${pieceCount}`}>
+            <div className={`tray-grid tray-${activePieceCount}`}>
               {trayPieces.map((piece) => (
                 <button
                   key={piece}
@@ -713,7 +708,7 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
                   onDragStart={(event) => { event.dataTransfer.setData('text/plain', String(piece)); setSelectedTrayPiece(piece); }}
                   style={{ aspectRatio: `${4 * gridRows} / ${3 * gridColumns}` }}
                 >
-                  <JigsawPiece piece={piece} rows={gridRows} columns={gridColumns} imageUrl={selectedPhoto.url} showImage variant="tray" className="tray-piece-svg"/>
+                  <JigsawPiece piece={piece} rows={gridRows} columns={gridColumns} imageUrl={activePhoto.url} showImage variant="tray" className="tray-piece-svg"/>
                 </button>
               ))}
             </div>
