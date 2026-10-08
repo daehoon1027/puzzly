@@ -5,9 +5,9 @@ import { InfoPage } from './info-page';
 const copy = {
   ko: {
     eyebrow: 'FREE ONLINE PHOTO PUZZLE',
-    title: '사진 퍼즐 만들기: 검색부터 완성까지 한 화면에서',
+    title: '사진 업로드 없이 퍼즐 만드는 방법: 검색부터 완성까지',
     intro: '파일을 올리지 않아도 검색어로 사진을 고르고, 12~400피스의 정사각형 교환 또는 직소 퍼즐을 무료로 바로 시작할 수 있습니다.',
-    updated: '퍼즐리 이용 안내 · 2026년 10월 2일 업데이트',
+    updated: '퍼즐리 이용 안내 · 2026년 10월 8일 업데이트',
     ctaTitle: '지금 사진을 고르고 시작하세요',
     ctaBody: '회원가입과 설치 없이 검색어를 입력하고 추천 사진 중 한 장을 선택하면 됩니다.',
     cta: '무료 사진 퍼즐 만들기 →',
@@ -41,9 +41,9 @@ const copy = {
   },
   en: {
     eyebrow: 'FREE ONLINE PHOTO PUZZLE',
-    title: 'Make a photo puzzle online, from search to finish',
+    title: 'Make a photo puzzle without uploading, from search to finish',
     intro: 'Search for a scene, choose a photograph, and start a free 12–400 piece square-swap or jigsaw puzzle without uploading a file.',
-    updated: 'Puzzly guide · Updated October 2, 2026',
+    updated: 'Puzzly guide · Updated October 8, 2026',
     ctaTitle: 'Choose a photo and start now',
     ctaBody: 'No account or installation is required. Enter a search phrase and select one of the suggested photographs.',
     cta: 'Make a free photo puzzle →',

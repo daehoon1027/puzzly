@@ -4,28 +4,28 @@ import { PuzzleHome } from '../components/puzzle-home';
 import { CollectionCards } from '../components/collection-pages';
 
 export const metadata: Metadata = {
-  title: { absolute: 'Make a Photo Puzzle Online | Free Jigsaw Game - Puzzly' },
-  description: 'Search for a photo and make a free 12 to 400 piece online puzzle. Choose square swap or jigsaw mode and play instantly in your browser.',
+  title: { absolute: 'Make a Photo Puzzle from a Search | Free Online Game - Puzzly' },
+  description: 'Find an image by search and start a free 12–400 piece square-swap or jigsaw puzzle instantly, with no account or photo upload.',
   keywords: ['make a photo puzzle online', 'free online jigsaw puzzle', 'photo puzzle', 'jigsaw puzzle game', 'image puzzle'],
   creator: 'daehoon1027',
   publisher: 'Puzzly',
   alternates: {
     canonical: '/en',
-    languages: { 'ko-KR': '/', 'en-US': '/en' },
+    languages: { 'ko-KR': '/', 'en-US': '/en', 'x-default': '/' },
   },
   openGraph: {
     type: 'website',
     locale: 'en_US',
     siteName: 'Puzzly',
-    title: 'Make a Photo Puzzle Online | Free Jigsaw Game - Puzzly',
-    description: 'Search for a photo and make a free 12–400 piece square or jigsaw puzzle.',
+    title: 'Make a Photo Puzzle from a Search | Free Online Game',
+    description: 'Find an image by search and start a free 12–400 piece puzzle with no upload.',
     url: '/en',
     images: [{ url: '/og.png', width: 1200, height: 630, alt: 'Puzzly free online photo puzzle maker' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Make a Photo Puzzle Online | Free Jigsaw Game',
-    description: 'Search for a photo and make a free 12–400 piece web puzzle.',
+    title: 'Make a Photo Puzzle from a Search | Free Online Game',
+    description: 'Find an image by search and start a free 12–400 piece web puzzle.',
     images: ['/og.png'],
   },
 };

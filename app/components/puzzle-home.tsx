@@ -51,9 +51,9 @@ const difficulties = [12, 20, 30, 48, 80, 120, 200, 400];
 
 const uiCopy = {
   ko: {
-    initialQuery: '알프스의 봄', eyebrow: '나만의 이미지 퍼즐', heroLine1: '상상한 장면을,', heroLine2: '퍼즐로 맞춰보세요.',
-    heroBody1: '원하는 단어를 입력하면 어울리는 그림을 추천해드려요.', heroBody2: '마음에 드는 한 장을 골라 나만의 퍼즐을 시작하세요.',
-    quickStartEyebrow: '바로 시작', quickStartTitle: '먼저, 마음에 드는 그림을 골라보세요', quickStartMeta: '20피스 · 정사각형 교환', quickStartButton: '이 그림으로 바로 시작',
+    initialQuery: '알프스의 봄', eyebrow: '무료 온라인 사진 퍼즐', heroLine1: '검색어로 사진을 찾아', heroLine2: '무료 퍼즐을 만들어보세요.',
+    heroBody1: '회원가입이나 사진 업로드 없이 원하는 장면을 검색하세요.', heroBody2: '마음에 드는 한 장을 골라 12~400피스 퍼즐을 바로 시작할 수 있습니다.',
+    quickStartEyebrow: '바로 시작', quickStartTitle: '무료 사진 퍼즐, 그림을 골라 바로 시작하세요', quickStartMeta: '20피스 · 정사각형 교환', quickStartButton: '이 그림으로 바로 시작',
     searchLabel: '찾고 싶은 그림', placeholder: '예: 노을 진 바다, 귀여운 고양이, 서울 야경', searching: '찾는 중...', searchButton: '그림 찾기', suggestions: '이런 건 어때요?',
     tags: ['바다', '고양이', '도시 야경', '케이크'], guideTitle: '검색어 안내',
     guide1: '사물·장소·분위기나 인물의 특징과 상황을 구체적으로 적으면 더 잘 찾을 수 있어요. 예: ‘웃는 가족’, ‘빨간 우산을 든 사람’.',
@@ -85,9 +85,9 @@ const uiCopy = {
     modalLabel: '이미지 검색 안내', modalTitle: '대체 이미지를 제공했습니다', apiError: 'API 오류 원인', confirm: '확인',
   },
   en: {
-    initialQuery: 'Spring in the Alps', eyebrow: 'YOUR OWN PHOTO PUZZLE', heroLine1: 'Turn any scene', heroLine2: 'into a puzzle.',
-    heroBody1: 'Enter a few words and we will find images that fit.', heroBody2: 'Choose your favorite and start a puzzle made just for you.',
-    quickStartEyebrow: 'QUICK START', quickStartTitle: 'Choose a picture and start playing', quickStartMeta: '20 pieces · Square swap', quickStartButton: 'Start with this picture',
+    initialQuery: 'Spring in the Alps', eyebrow: 'FREE ONLINE PHOTO PUZZLE', heroLine1: 'Find a photo by search', heroLine2: 'and make a free puzzle.',
+    heroBody1: 'No account or photo upload is needed.', heroBody2: 'Choose a result and start a 12–400 piece puzzle instantly.',
+    quickStartEyebrow: 'QUICK START', quickStartTitle: 'Choose a free photo puzzle and start playing', quickStartMeta: '20 pieces · Square swap', quickStartButton: 'Start with this picture',
     searchLabel: 'Find an image', placeholder: 'Try: sunset beach, cute cat, city at night', searching: 'Searching...', searchButton: 'Find images', suggestions: 'Need an idea?',
     tags: ['Ocean', 'Cats', 'City at night', 'Cake'], guideTitle: 'Search tips',
     guide1: 'Describe an object, place, mood, or a person’s features and situation. For example: “smiling family” or “person with a red umbrella.”',

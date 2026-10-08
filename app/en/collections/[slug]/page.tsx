@@ -8,7 +8,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const item = collections.find(item => item.slug === slug);
   if (!item) notFound();
-  return contentMetadata(`/collections/${slug}`, 'en', item.en.title, item.en.summary);
+  const subject = item.en.title.split(':')[0];
+  return contentMetadata(
+    `/collections/${slug}`,
+    'en',
+    `${subject} · ${item.pieces} Pieces | Free Online Photo Puzzle`,
+    `${item.en.summary} Start this free ${item.pieces}-piece photo puzzle with no account required.`,
+  );
 }
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

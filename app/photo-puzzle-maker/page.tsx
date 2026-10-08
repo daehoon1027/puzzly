@@ -4,8 +4,8 @@ import { contentMetadata } from '../content/metadata';
 export const metadata = contentMetadata(
   '/photo-puzzle-maker',
   'ko',
-  '사진 퍼즐 만들기 | 무료 온라인 직소 퍼즐',
-  '검색어로 사진을 고르고 12~400피스의 정사각형 또는 직소 퍼즐을 무료로 만드는 방법과 조각 수 선택법을 안내합니다.',
+  '사진 업로드 없이 퍼즐 만드는 방법 | 검색어·피스 수 가이드',
+  '검색어로 사진을 찾고 12~400피스의 정사각형 또는 직소 퍼즐을 만드는 순서, 이미지 선택법과 권장 조각 수를 안내합니다.',
 );
 
 export default function Page() {

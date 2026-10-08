@@ -18,7 +18,7 @@ export function CollectionCards({ locale, slugs, excludeSlug, limit }: { locale:
 export function CollectionIndex({ locale }: { locale: Language }) {
   const en = locale === 'en';
   const base = en ? '/en' : '';
-  return <InfoPage compact locale={locale} path={`${base}/collections`} eyebrow="THE PUZZLY COLLECTION" title={en ? 'Choose a clue and start playing.' : '단서 하나를 고르고 바로 시작하세요'} intro={en ? 'Each photograph has one clear starting point, a suggested piece count, and a playable puzzle.' : '사진마다 첫 기준점과 추천 조각 수를 정했습니다. 마음에 드는 장면을 고르면 바로 퍼즐로 이어집니다.'}>
+  return <InfoPage compact locale={locale} path={`${base}/collections`} eyebrow="THE PUZZLY COLLECTION" title={en ? 'Choose one of six free online photo puzzles.' : '무료 온라인 사진 퍼즐 6개를 골라 시작하세요'} intro={en ? 'Each photograph has one clear starting point, a suggested piece count, and a playable puzzle.' : '풍경·동물·도시·음식 사진마다 첫 기준점과 추천 조각 수를 정했습니다. 마음에 드는 장면을 고르면 바로 퍼즐로 이어집니다.'}>
     <nav className="priority-links" aria-label={en ? 'Recommended starting puzzles' : '추천 시작 퍼즐'}>
       <Link href={`${base}/collections/mountain-lake`}><span>{en ? 'FIRST PUZZLE' : '처음이라면'}</span><b>{en ? 'Mountain lake · 20 pieces' : '산과 호수 · 20피스'}</b></Link>
       <Link href={`${base}/collections/snow-fox`}><span>{en ? 'CLEAR SUBJECT' : '주제가 선명한'}</span><b>{en ? 'Snow fox · 30 pieces' : '눈밭의 여우 · 30피스'}</b></Link>

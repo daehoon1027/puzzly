@@ -19,7 +19,7 @@ function GuideLinks({ locale, slugs }: { locale: Language; slugs: readonly strin
 export function GuideIndex({ locale }: { locale: Language }) {
   const en = locale === 'en'; const base = en ? '/en' : '';
   const advancedGuideSlugs = guides.map(item => item.slug).filter(slug => !starterGuideSlugs.includes(slug as typeof starterGuideSlugs[number]));
-  return <InfoPage compact locale={locale} path={`${base}/guide`} eyebrow="PUZZLE FIELD GUIDE" title={en ? 'Start with the guide you need now.' : '지금 필요한 가이드부터 시작하세요'} intro={en ? 'Learn the controls first, then choose a photograph and piece count. Continue to observation and session notes when you are ready.' : '조작법을 먼저 익히고 사진과 조각 수를 고르세요. 익숙해진 뒤 관찰법과 플레이 기록으로 이어갈 수 있습니다.'}>
+  return <InfoPage compact locale={locale} path={`${base}/guide`} eyebrow="PUZZLE FIELD GUIDE" title={en ? 'Online photo puzzle guide: controls, pieces, and solving tips' : '온라인 사진 퍼즐 가이드: 조작법부터 풀이 요령까지'} intro={en ? 'Learn the controls first, then choose a photograph and piece count. Continue to observation and session notes when you are ready.' : '무료 사진 퍼즐 조작법을 먼저 익히고 이미지와 조각 수를 고르세요. 익숙해진 뒤 관찰법과 플레이 기록으로 이어갈 수 있습니다.'}>
     <section className="priority-section"><span>{en ? 'START HERE' : '먼저 볼 가이드'}</span><GuideLinks locale={locale} slugs={starterGuideSlugs} /></section>
     <section><h2>{en ? 'Improve observation and longer play' : '관찰과 긴 플레이'}</h2><GuideLinks locale={locale} slugs={advancedGuideSlugs} /></section>
     <p className="content-footnote">{en ? <>Progress is not saved after refresh or navigation. Testing and writing standards are in the <Link href={`${base}/editorial`}>editorial process</Link>.</> : <>진행은 새로고침이나 페이지 이동 뒤 저장되지 않습니다. 검증 기준은 <Link href={`${base}/editorial`}>콘텐츠 작성·검증 원칙</Link>에서 확인하세요.</>}</p>
