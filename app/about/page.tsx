@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { InfoPage } from '../components/info-page';
-export const metadata: Metadata={title:'서비스 소개',description:'이미지를 고르고 난이도와 방식을 선택해 즐기는 무료 웹 퍼즐, 퍼즐리를 소개합니다.',alternates:{canonical:'/about'}};
+export const metadata: Metadata={title:'서비스 소개',description:'이미지를 고르고 난이도와 방식을 선택해 즐기는 무료 웹 퍼즐, 퍼즐리를 소개합니다.',alternates:{canonical:'/about',languages:{'ko-KR':'/about','en-US':'/en/about','x-default':'/about'}}};
 export default function Page(){return <InfoPage path="/about" eyebrow="ABOUT PUZZLY" title="한 장의 그림을 오래 바라보는 방법" intro="퍼즐리는 검색한 주제에 어울리는 이미지를 고르고, 원하는 방식과 난이도로 바로 즐길 수 있는 무료 웹 퍼즐입니다.">
 <aside className="info-cta info-cta-first"><h2>직접 퍼즐을 만들어보세요</h2><p>회원가입 없이 사진을 고르고 12~400피스 중 원하는 난이도로 시작할 수 있습니다.</p><Link href="/#make">퍼즐 만들기 →</Link></aside>
 <section><h2>퍼즐리를 만든 이유</h2><p>짧은 영상과 빠른 화면 전환이 익숙한 일상에서, 한 장의 그림을 천천히 살펴보는 시간은 생각보다 특별합니다. 퍼즐리는 설치나 회원가입 없이 누구나 작은 몰입을 시작할 수 있도록 만들었습니다. 검색어 하나를 입력하고, 마음에 드는 이미지를 고른 뒤, 자신의 속도에 맞는 조각 수를 선택하면 됩니다.</p><p>이 서비스의 핵심은 정답을 빨리 찾는 데 있지 않습니다. 색의 미묘한 차이, 사물의 윤곽, 반복되는 질감과 조각의 굴곡을 관찰하며 그림을 다시 발견하는 과정 자체를 중요하게 생각합니다.</p></section>

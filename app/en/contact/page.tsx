@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   keywords: ['contact Puzzly', 'puzzle support', 'photo puzzle feedback'],
   creator: 'daehoon1027',
   publisher: 'Puzzly',
-  alternates: { canonical: '/en/contact', languages: { 'ko-KR': '/contact', 'en-US': '/en/contact' } },
+  alternates: { canonical: '/en/contact', languages: { 'ko-KR': '/contact', 'en-US': '/en/contact', 'x-default': '/contact' } },
   openGraph: { type: 'website', locale: 'en_US', siteName: 'Puzzly', title: 'Contact Puzzly | Puzzly', description: 'Contact Puzzly about bugs, image rights, privacy, or product feedback.', url: '/en/contact', images: [{ url: '/og.png', width: 1200, height: 630, alt: 'Contact Puzzly' }] },
   twitter: { card: 'summary_large_image', title: 'Contact Puzzly | Puzzly', description: 'Contact Puzzly about bugs, image rights, privacy, or product feedback.', images: ['/og.png'] },
 };

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { InfoPage } from '../components/info-page';
-export const metadata: Metadata={title:'이용약관',description:'퍼즐리 웹 퍼즐 서비스의 이용 조건과 콘텐츠 권리 안내입니다.',alternates:{canonical:'/terms'}};
+export const metadata: Metadata={title:'이용약관',description:'퍼즐리 웹 퍼즐 서비스의 이용 조건과 콘텐츠 권리 안내입니다.',alternates:{canonical:'/terms',languages:{'ko-KR':'/terms','en-US':'/en/terms','x-default':'/terms'}}};
 export default function Page(){return <InfoPage path="/terms" eyebrow="TERMS" title="이용약관" intro="퍼즐리를 이용하기 전에 서비스의 범위와 외부 콘텐츠 이용 기준을 확인해 주세요. 시행일: 2026년 8월 27일">
 <section><h2>1. 서비스의 목적</h2><p>퍼즐리는 사용자가 주제에 맞는 이미지를 선택하고 웹 브라우저에서 이미지 퍼즐을 즐길 수 있도록 제공되는 무료 서비스입니다. 회원가입 없이 이용할 수 있으며 일부 기능은 외부 이미지 및 호스팅 서비스에 의존합니다.</p></section>
 <section><h2>2. 올바른 이용</h2><p>사용자는 관련 법령과 타인의 권리를 존중해야 합니다. 서비스의 정상적인 운영을 방해하거나, 자동화된 대량 요청을 보내거나, 불법적·유해한 목적으로 서비스를 이용해서는 안 됩니다.</p></section>

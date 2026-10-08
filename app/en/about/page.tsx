@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   keywords: ['about Puzzly', 'free photo puzzle', 'jigsaw puzzle game'],
   creator: 'daehoon1027',
   publisher: 'Puzzly',
-  alternates: { canonical: '/en/about', languages: { 'ko-KR': '/about', 'en-US': '/en/about' } },
+  alternates: { canonical: '/en/about', languages: { 'ko-KR': '/about', 'en-US': '/en/about', 'x-default': '/about' } },
   openGraph: { type: 'website', locale: 'en_US', siteName: 'Puzzly', title: 'About Puzzly | Puzzly', description: 'Learn why Puzzly was built and how its free photo puzzle experience works.', url: '/en/about', images: [{ url: '/og.png', width: 1200, height: 630, alt: 'About Puzzly' }] },
   twitter: { card: 'summary_large_image', title: 'About Puzzly | Puzzly', description: 'Learn why Puzzly was built and how its free photo puzzle experience works.', images: ['/og.png'] },
 };

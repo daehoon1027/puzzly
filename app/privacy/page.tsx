@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { InfoPage } from '../components/info-page';
-export const metadata: Metadata={title:'개인정보처리방침',description:'퍼즐리의 개인정보 처리, 외부 이미지, 쿠키 및 광고 관련 안내입니다.',alternates:{canonical:'/privacy'}};
+export const metadata: Metadata={title:'개인정보처리방침',description:'퍼즐리의 개인정보 처리, 외부 이미지, 쿠키 및 광고 관련 안내입니다.',alternates:{canonical:'/privacy',languages:{'ko-KR':'/privacy','en-US':'/en/privacy','x-default':'/privacy'}}};
 export default function Page(){return <InfoPage path="/privacy" eyebrow="PRIVACY" title="개인정보처리방침" intro="퍼즐리는 필요한 정보만 최소한으로 다루며, 방문자가 서비스의 데이터 흐름을 이해할 수 있도록 공개합니다. 시행일: 2026년 10월 6일">
 <section><h2>1. 수집하는 개인정보</h2><p>퍼즐리는 회원가입 기능을 제공하지 않으며 이름, 전화번호, 주소 등의 개인정보를 직접 입력받아 서버에 저장하지 않습니다. 사용자가 입력한 이미지 검색어는 이미지 추천을 위해 일시적으로 처리되지만 퍼즐리의 사용자 계정이나 데이터베이스에 저장하지 않습니다. 진행 중인 조각 위치는 브라우저에서만 처리됩니다. 퍼즐을 완성한 경우 전체 순위 제공을 위해 무작위 브라우저 식별값을 일방향 해시한 값, 퍼즐 모드, 피스 수, 사진 식별값과 제목, 시작·완성 시각, 완성 시간 및 이동 횟수를 저장합니다.</p></section>
 <section><h2>2. 자동으로 전달될 수 있는 정보</h2><p>사이트 접속 과정에서 호스팅 제공자 또는 외부 콘텐츠 제공자에게 IP 주소, 브라우저 종류, 접속 시각, 요청한 주소와 같은 일반적인 접속 정보가 전달될 수 있습니다. 이는 보안, 장애 대응, 이미지 제공 등 각 서비스의 운영 목적에 따라 처리될 수 있습니다.</p></section>
