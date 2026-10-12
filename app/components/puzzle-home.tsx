@@ -53,7 +53,8 @@ const uiCopy = {
   ko: {
     initialQuery: '알프스의 봄', eyebrow: '무료 온라인 사진 퍼즐', heroLine1: '검색어로 사진을 찾아', heroLine2: '무료 퍼즐을 만들어보세요.',
     heroBody1: '회원가입이나 사진 업로드 없이 원하는 장면을 검색하세요.', heroBody2: '마음에 드는 한 장을 골라 12~400피스 퍼즐을 바로 시작할 수 있습니다.',
-    quickStartEyebrow: '바로 시작', quickStartTitle: '무료 사진 퍼즐, 그림을 골라 바로 시작하세요', quickStartMeta: '20피스 · 정사각형 교환', quickStartButton: '이 그림으로 바로 시작',
+    quickStartEyebrow: '바로 시작', quickStartTitle: '무료 사진 퍼즐, 그림을 골라 바로 시작하세요', quickStartButton: '이 설정으로 바로 시작',
+    quickModeLabel: '퍼즐 방법', quickPiecesLabel: '조각 수', quickClassic: '방법 1 · 정사각형 교환', quickShape: '방법 2 · 직소 끼우기',
     searchLabel: '찾고 싶은 그림', placeholder: '예: 노을 진 바다, 귀여운 고양이, 서울 야경', searching: '찾는 중...', searchButton: '그림 찾기', suggestions: '이런 건 어때요?',
     tags: ['바다', '고양이', '도시 야경', '케이크'], guideTitle: '검색어 안내',
     guide1: '사물·장소·분위기나 인물의 특징과 상황을 구체적으로 적으면 더 잘 찾을 수 있어요. 예: ‘웃는 가족’, ‘빨간 우산을 든 사람’.',
@@ -87,7 +88,8 @@ const uiCopy = {
   en: {
     initialQuery: 'Spring in the Alps', eyebrow: 'FREE ONLINE PHOTO PUZZLE', heroLine1: 'Find a photo by search', heroLine2: 'and make a free puzzle.',
     heroBody1: 'No account or photo upload is needed.', heroBody2: 'Choose a result and start a 12–400 piece puzzle instantly.',
-    quickStartEyebrow: 'QUICK START', quickStartTitle: 'Choose a free photo puzzle and start playing', quickStartMeta: '20 pieces · Square swap', quickStartButton: 'Start with this picture',
+    quickStartEyebrow: 'QUICK START', quickStartTitle: 'Choose a free photo puzzle and start playing', quickStartButton: 'Start with these settings',
+    quickModeLabel: 'Puzzle method', quickPiecesLabel: 'Piece count', quickClassic: 'Method 1 · Square swap', quickShape: 'Method 2 · Shape fit',
     searchLabel: 'Find an image', placeholder: 'Try: sunset beach, cute cat, city at night', searching: 'Searching...', searchButton: 'Find images', suggestions: 'Need an idea?',
     tags: ['Ocean', 'Cats', 'City at night', 'Cake'], guideTitle: 'Search tips',
     guide1: 'Describe an object, place, mood, or a person’s features and situation. For example: “smiling family” or “person with a red umbrella.”',
@@ -152,8 +154,8 @@ async function fetchRecommendedPhotos(term: string, locale: Locale, signal?: Abo
   const response = await fetch(`/api/photos?q=${encodeURIComponent(term)}&locale=${locale}`, { signal });
   const data = (await response.json()) as { photos?: Photo[]; error?: string };
   if (!response.ok) throw new PhotoSearchError(data.error ?? (locale === 'en' ? 'Image search failed.' : '이미지 검색에 실패했습니다.'), response.status);
-  if (!data.photos || data.photos.length < 10) {
-    throw new PhotoSearchError(locale === 'en' ? 'Fewer than 10 suitable images were returned.' : '검색 결과가 10장보다 적어 추천 목록을 완성하지 못했습니다.', 502);
+  if (!data.photos || data.photos.length < 4) {
+    throw new PhotoSearchError(locale === 'en' ? 'Fewer than four suitable images were returned.' : '검색 결과가 4장보다 적어 추천 목록을 완성하지 못했습니다.', 502);
   }
   return data.photos;
 }
@@ -540,20 +542,31 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
     <Container lang={locale} className={embedded ? 'embedded-puzzle' : undefined}>
       {!embedded && <SiteHeader locale={locale} />}
 
-      {!embedded && <section className="hero" id="top">
+      {!embedded && <section className="hero" id="make">
         <div className="hero-quickplay" aria-labelledby="quick-start-title">
           <div className="quickplay-heading">
             <div><span>{t.quickStartEyebrow}</span><h2 id="quick-start-title">{t.quickStartTitle}</h2></div>
-            <small>{t.quickStartMeta}</small>
           </div>
-          <div className="quickplay-grid">
-            {photos.slice(0, 4).map((photo) => <button key={photo.id} className={selectedPhoto?.id === photo.id ? 'selected' : ''} onClick={() => setSelectedPhoto(photo)} aria-label={photo.label} aria-pressed={selectedPhoto?.id === photo.id}>
-              <Image src={photo.url} alt="" fill sizes="(max-width: 600px) 44vw, 240px" priority />
-              <span>{photo.label}</span>
-              {selectedPhoto?.id === photo.id && <b aria-hidden="true">✓</b>}
-            </button>)}
+          <div className="quickplay-settings">
+            <label><span>{t.quickModeLabel}</span><select value={mode} onChange={(event) => { setMode(event.target.value as PuzzleMode); if (!activeRun) setLeaderboardState('loading'); }} disabled={busy || startingPuzzle}>
+              <option value="classic">{t.quickClassic}</option>
+              <option value="shape">{t.quickShape}</option>
+            </select></label>
+            <label><span>{t.quickPiecesLabel}</span><select value={pieceCount} onChange={(event) => { setPieceCount(Number(event.target.value)); if (!activeRun) setLeaderboardState('loading'); }} disabled={busy || startingPuzzle}>
+              {difficulties.map((count) => <option key={count} value={count}>{count} {t.pieces}</option>)}
+            </select></label>
           </div>
-          <button className="quickplay-start" onClick={() => void startPuzzle(20, 'classic')} disabled={busy || startingPuzzle || !selectedPhoto}>{startingPuzzle ? t.startPreparing : busy ? t.searching : t.quickStartButton}<span>→</span></button>
+          <div className={`quickplay-grid ${busy ? 'is-loading' : ''}`} aria-busy={busy}>
+            {photos.slice(0, 4).map((photo) => <div className="quickplay-photo" key={photo.id}>
+              <button className={selectedPhoto?.id === photo.id ? 'selected' : ''} onClick={() => setSelectedPhoto(photo)} aria-label={photo.label} aria-pressed={selectedPhoto?.id === photo.id} disabled={busy}>
+                <Image src={photo.url} alt="" fill sizes="(max-width: 600px) 44vw, 240px" priority />
+                <span>{photo.label}</span>
+                {selectedPhoto?.id === photo.id && <b aria-hidden="true">✓</b>}
+              </button>
+              {photo.sourceUrl ? <a className="quickplay-source" href={photo.sourceUrl} target="_blank" rel="noreferrer">{photo.credit}</a> : <span className="quickplay-source">{photo.credit}</span>}
+            </div>)}
+          </div>
+          <button className="quickplay-start" onClick={() => void startPuzzle()} disabled={busy || startingPuzzle || !selectedPhoto}>{startingPuzzle ? t.startPreparing : busy ? t.searching : t.quickStartButton}<span>→</span></button>
           <aside className="hero-ranking" aria-label={t.leaderboardTitle(rankingPieceCount, rankingMode)}>
             <div><span>BEST RECORD</span><b>{rankingPhoto?.label} · {t.leaderboardTitle(rankingPieceCount, rankingMode)}</b></div>
             {leaderboardState === 'loading' ? <small role="status">{t.leaderboardLoading}</small>
@@ -583,7 +596,7 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
         </div>
       </section>}
 
-      <section className="workspace" id="make" aria-labelledby="recommend-title">
+      {embedded && <section className="workspace" id="make" aria-labelledby="recommend-title">
         <div className="section-heading">
           <div><span className="step">01</span><h2 id="recommend-title">{t.recommendTitle(displayedQuery)}</h2><p>{busy ? t.findingPhotos : t.choosePhoto}</p></div>
           <span className="result-count" role="status" aria-live="polite">{busy ? t.searching : t.photoCount(photos.length)}</span>
@@ -631,7 +644,7 @@ export function PuzzleHome({ locale, preset, defaultPieces = 20, embedded = fals
           <button className="start-button" onClick={() => void startPuzzle()} disabled={busy || startingPuzzle || !selectedPhoto}>{startingPuzzle ? t.startPreparing : mode === 'classic' ? t.start1 : t.start2} <span>→</span></button>
         </div>
 
-      </section>
+      </section>}
 
       {pieces && activePhoto && <section className="puzzle-section" id="puzzle">
         <div className="puzzle-top">

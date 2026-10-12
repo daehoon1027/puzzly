@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
 
   const url = new URL('https://api.pexels.com/v1/search');
   url.searchParams.set('query', translateQuery(query));
-  url.searchParams.set('per_page', '20');
+  url.searchParams.set('per_page', '12');
   url.searchParams.set('orientation', 'landscape');
   url.searchParams.set('locale', isEnglish ? 'en-US' : 'ko-KR');
 
@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
     const data = (await response.json()) as { photos?: PexelsPhoto[] };
     const photos = (data.photos ?? [])
       .filter((photo) => photo.width >= photo.height && (photo.src.large || photo.src.landscape))
-      .slice(0, 10)
+      .slice(0, 4)
       .map((photo) => ({
         id: `pexels-${photo.id}`,
         url: photo.src.large ?? photo.src.landscape!,
@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
         photographerUrl: photo.photographer_url,
       }));
 
-    if (photos.length < 10) {
+    if (photos.length < 4) {
       return NextResponse.json({ error: isEnglish ? 'Not enough suitable images were found.' : '조건에 맞는 이미지를 충분히 찾지 못했어요.' }, { status: 404 });
     }
     return NextResponse.json(
