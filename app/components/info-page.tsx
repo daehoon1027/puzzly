@@ -2,10 +2,11 @@ import type { ReactNode } from 'react';
 import { SiteHeader } from './site-header';
 import { SiteFooter } from './site-footer';
 import { PageLanguage } from './page-language';
+import { SITE_URL } from '../lib/site';
 
 export function InfoPage({ eyebrow, title, intro, children, locale = 'ko', path, compact = false }: { eyebrow: string; title: string; intro: string; children: ReactNode; locale?: 'ko' | 'en'; path?: string; compact?: boolean }) {
   const currentPath = path ?? (locale === 'en' ? '/en' : '/');
-  const currentUrl = `https://puzzly-one.vercel.app${currentPath}`;
+  const currentUrl = `${SITE_URL}${currentPath}`;
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
@@ -13,11 +14,11 @@ export function InfoPage({ eyebrow, title, intro, children, locale = 'ko', path,
     description: intro,
     url: currentUrl,
     inLanguage: locale === 'en' ? 'en-US' : 'ko-KR',
-    isPartOf: { '@id': 'https://puzzly-one.vercel.app/#website' },
+    isPartOf: { '@id': `${SITE_URL}/#website` },
     breadcrumb: {
       '@type': 'BreadcrumbList',
       itemListElement: [
-        { '@type': 'ListItem', position: 1, name: locale === 'en' ? 'Puzzly home' : '퍼즐리 홈', item: locale === 'en' ? 'https://puzzly-one.vercel.app/en' : 'https://puzzly-one.vercel.app/' },
+        { '@type': 'ListItem', position: 1, name: locale === 'en' ? 'Puzzly home' : '퍼즐리 홈', item: locale === 'en' ? `${SITE_URL}/en` : `${SITE_URL}/` },
         { '@type': 'ListItem', position: 2, name: title, item: currentUrl },
       ],
     },

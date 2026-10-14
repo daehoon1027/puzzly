@@ -1,9 +1,10 @@
 import type { MetadataRoute } from 'next';
 import { collections } from './content/collections';
 import { guides } from './content/guides';
+import { SITE_URL } from './lib/site';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = 'https://puzzly-one.vercel.app';
+  const base = SITE_URL;
   const paired = ['', '/photo-puzzle-maker', '/guide', ...guides.map(item => `/guide/${item.slug}`), '/collections', ...collections.map(item => `/collections/${item.slug}`), '/about', '/editorial', '/privacy', '/terms', '/contact'];
   const paths = paired.flatMap(path => [path, `/en${path}`]);
   return paths.map((path) => ({

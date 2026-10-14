@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
-import { Analytics } from '@vercel/analytics/next';
 import { AdSenseScript } from './components/adsense-script';
+import { SITE_URL } from './lib/site';
 import './globals.css';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://puzzly-one.vercel.app'),
+  metadataBase: new URL(SITE_URL),
   title: { default: '사진 퍼즐 만들기 | 검색어로 찾아 무료 플레이 - 퍼즐리', template: '%s | 퍼즐리' },
   description: '회원가입이나 사진 업로드 없이 검색어로 원하는 이미지를 찾고, 12~400피스의 정사각형 교환·직소 퍼즐을 무료로 바로 시작하세요.',
   keywords: ['사진 퍼즐 만들기', '무료 온라인 직소 퍼즐', '온라인 사진 퍼즐', '이미지 퍼즐', '그림 퍼즐', '웹 퍼즐 게임'],
@@ -32,41 +32,41 @@ const structuredData = {
   '@graph': [
     {
       '@type': 'WebSite',
-      '@id': 'https://puzzly-one.vercel.app/#website',
-      url: 'https://puzzly-one.vercel.app/',
+      '@id': `${SITE_URL}/#website`,
+      url: `${SITE_URL}/`,
       name: '퍼즐리',
       alternateName: 'Puzzly',
       description: '사진 업로드 없이 검색어로 이미지를 찾아 원하는 조각 수와 방식으로 즐기는 무료 온라인 사진 퍼즐 만들기',
       inLanguage: 'ko-KR',
-      creator: { '@id': 'https://puzzly-one.vercel.app/#creator' },
+      creator: { '@id': `${SITE_URL}/#creator` },
     },
     {
       '@type': 'WebApplication',
-      '@id': 'https://puzzly-one.vercel.app/#application',
-      url: 'https://puzzly-one.vercel.app/',
+      '@id': `${SITE_URL}/#application`,
+      url: `${SITE_URL}/`,
       name: '퍼즐리',
       applicationCategory: 'GameApplication',
       applicationSubCategory: 'Puzzle Game',
       operatingSystem: 'Any',
       browserRequirements: 'JavaScript와 HTML5를 지원하는 최신 웹 브라우저',
       description: '검색한 사진을 12피스부터 400피스까지 정사각형 교환 또는 직소 모양 끼우기로 바로 즐기는 무료 온라인 사진 퍼즐',
-      image: 'https://puzzly-one.vercel.app/og.png',
+      image: `${SITE_URL}/og.png`,
       inLanguage: 'ko-KR',
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'KRW' },
-      creator: { '@id': 'https://puzzly-one.vercel.app/#creator' },
+      creator: { '@id': `${SITE_URL}/#creator` },
     },
     {
       '@type': 'Person',
-      '@id': 'https://puzzly-one.vercel.app/#creator',
+      '@id': `${SITE_URL}/#creator`,
       name: 'daehoon1027',
       jobTitle: '퍼즐리 제작자·편집자',
-      url: 'https://puzzly-one.vercel.app/editorial',
+      url: `${SITE_URL}/editorial`,
       sameAs: ['https://github.com/daehoon1027'],
     },
   ],
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="ko"><head><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} /></head><body>{children}<Analytics /><AdSenseScript /></body></html>;
+  return <html lang="ko"><head><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} /></head><body>{children}<AdSenseScript /></body></html>;
 }

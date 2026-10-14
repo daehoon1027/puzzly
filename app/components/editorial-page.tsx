@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { InfoPage } from './info-page';
+import { SITE_URL } from '../lib/site';
 
 const copy = {
   ko: {
@@ -79,7 +80,7 @@ export function EditorialPage({ locale }: { locale: 'ko' | 'en' }) {
       '@type': 'Person',
       name: 'daehoon1027',
       jobTitle: en ? 'Puzzly creator and editor' : '퍼즐리 제작자·편집자',
-      url: `https://puzzly-one.vercel.app${base}/editorial`,
+      url: `${SITE_URL}${base}/editorial`,
       sameAs: ['https://github.com/daehoon1027'],
     },
   };

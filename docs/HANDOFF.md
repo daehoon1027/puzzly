@@ -1,16 +1,16 @@
 # 퍼즐리 프로젝트 인수인계서
 
-작성일: 2026-09-01 (KST)
+최종 갱신일: 2026-10-14 (KST)
 
 ## 1. 프로젝트 위치와 배포
 
 - 로컬 작업 폴더: `D:\20. 기타\AI작업 파일\8. puzzle`
 - GitHub: https://github.com/daehoon1027/puzzly
-- 운영 사이트: https://puzzly-one.vercel.app
+- 운영 사이트: https://puzzly.cube-lab-cloud.workers.dev
 - 기본 브랜치: `main`
-- GitHub `main` 푸시 시 Vercel 자동 배포가 연결되어 있음
-- 현재 기준 최근 커밋: `c994d48 chore: add Naver Search Advisor verification`
-- 인수인계서 작성 직전 작업 트리는 깨끗했음
+- Cloudflare Worker 이름: `puzzly`
+- Cloudflare 계정 workers.dev 서브도메인: `cube-lab-cloud.workers.dev`
+- 배포 명령: `npm run deploy:cloudflare`
 
 ## 2. 기술 구성과 실행 명령
 
@@ -20,14 +20,16 @@
 - 개발 실행: `npm run dev`
 - 정적 검사: `npm run lint`
 - 프로덕션 빌드: `npm run build`
+- Cloudflare 미리보기: `npm run preview:cloudflare`
+- Cloudflare 배포: `npm run deploy:cloudflare`
 
-사이트를 수정한 뒤에는 반드시 `npm run lint`와 `npm run build`를 통과시키고, 커밋 후 `git push origin main`으로 배포한다. Vercel 배포가 Ready인지 확인한 뒤 운영 URL도 점검한다.
+사이트를 수정한 뒤에는 반드시 `npm run lint`와 `npm run build`를 통과시키고, `npm run deploy:cloudflare`로 배포한다. 배포 후 운영 URL과 API를 점검하고 변경 사항을 커밋·푸시한다.
 
 ## 3. 현재 구현된 핵심 기능
 
-- 사용자가 검색어를 입력하면 Pexels API에서 가로형 이미지 후보 10장을 추천함
+- 사용자가 검색어를 입력하면 Pexels API에서 가로형 이미지 후보 4장을 추천함
 - 한글 주요 검색어는 `app/api/photos/route.ts`에서 영어로 일부 변환함
-- Pexels API 오류, 요청 한도, 인증 오류 또는 검색 결과 부족 시 선별된 대체 이미지 10장을 표시함
+- Pexels API 오류, 요청 한도, 인증 오류 또는 검색 결과 부족 시 선별된 대체 이미지를 표시함
 - 대체 이미지 사용 시 API 오류 원인과 대체 이미지 제공 사실을 팝업으로 안내함
 - 특정 인물 검색은 Pexels의 메타데이터와 검색 방식 특성상 정확하지 않을 수 있음을 안내함
 - 버전 1: 정사각형 조각 두 개를 선택하여 위치를 교환하는 방식
@@ -48,10 +50,10 @@
 
 ## 4. 환경 변수
 
-- Vercel 환경 변수 이름: `PEXELS_API_KEY`
-- Production, Preview, Development에 등록됨
+- Cloudflare Worker 비밀값: `PEXELS_API_KEY`, `DATABASE_URL`
+- `PEXELS_API_KEY`는 사진 검색, `DATABASE_URL`은 공유 순위에 사용됨
 - 값은 비밀 키이므로 Git이나 문서에 기록하지 말 것
-- 사용자가 환경 변수 저장 후 재배포까지 완료했음
+- 등록·갱신은 `wrangler secret put` 또는 `wrangler secret bulk`를 사용하고 값은 표준 입력으로 전달할 것
 
 ## 5. 광고 및 수익화 상태
 
@@ -69,7 +71,7 @@
 
 - 매체명: `퍼즐리 - 무료 이미지 퍼즐`
 - 매체 유형: Web
-- 매체 URL: `puzzly-one.vercel.app`
+- 매체 URL: `puzzly.cube-lab-cloud.workers.dev`로 변경 필요
 - 카테고리: 게임, 엔터테인먼트
 - 광고 단위명: `퍼즐리 메인 하단 배너`
 - 광고 단위 ID: `DAN-sOiBuwLpaImB4HTt`
@@ -85,8 +87,8 @@
 - 메타 제목·설명·키워드, canonical, Open Graph, robots 설정 적용
 - WebSite 및 WebApplication/GameApplication JSON-LD 적용
 - `app/robots.ts`와 `app/sitemap.ts` 구현
-- 운영 robots: https://puzzly-one.vercel.app/robots.txt
-- 운영 sitemap: https://puzzly-one.vercel.app/sitemap.xml
+- 운영 robots: https://puzzly.cube-lab-cloud.workers.dev/robots.txt
+- 운영 sitemap: https://puzzly.cube-lab-cloud.workers.dev/sitemap.xml
 - 사이트맵에는 홈, 가이드 4개, 소개, 개인정보처리방침, 약관, 문의 등 9개 URL이 포함됨
 
 ### Google Search Console
@@ -127,10 +129,10 @@
 
 ## 7. 다음 작업 권장 순서
 
-1. `git status`, 운영 사이트 응답, Vercel 최근 배포 상태를 확인한다.
-2. Google Search Console에서 일일 할당량이 초기화되면 메인 URL의 색인 생성을 한 번만 요청한다.
-3. 네이버는 최소 며칠 기다린 뒤 사이트 진단의 색인 수와 수집 오류를 확인한다.
-4. AdSense와 AdFit의 심사 상태를 확인한다. 아직 심사 중이면 사이트를 과도하게 변경하지 않는다.
+1. `git status`, Cloudflare Worker 배포 상태와 운영 사이트 응답을 확인한다.
+2. Google Search Console과 네이버 Search Advisor에 새 Workers 주소를 등록하고 새 사이트맵을 제출한다.
+3. Google AdSense와 Kakao AdFit의 사이트 URL을 새 Workers 주소로 변경한다.
+4. 기존 Vercel 주소는 새 주소의 색인이 안정될 때까지 즉시 삭제하지 않는다.
 5. 검색 유입 데이터가 생기면 실제 노출 검색어를 기준으로 가이드 콘텐츠 제목과 본문을 보강한다.
 6. 승인 후 실제 광고 노출, 레이아웃 밀림, 모바일 퍼즐 조작과 광고 정책 준수 여부를 점검한다.
 
@@ -145,4 +147,4 @@
 
 ## 9. 새 작업의 첫 지시
 
-이 문서를 끝까지 읽고 현재 저장소 상태와 운영 사이트를 확인한 다음, Google Search Console·네이버 Search Advisor·AdSense·Kakao AdFit 중 지금 확인 가능한 상태를 정리하세요. 외부 로그인이 필요한 단계는 사용자가 해야 할 최소 행동만 안내하고, 코드나 배포로 처리할 수 있는 작업은 직접 진행하세요. 기존 기능과 사용자 변경을 보존하고, 수정 시 lint/build 검증과 GitHub 푸시 및 Vercel 배포 확인까지 완료하세요.
+이 문서를 끝까지 읽고 현재 저장소 상태와 운영 사이트를 확인한 다음, Google Search Console·네이버 Search Advisor·AdSense·Kakao AdFit 중 지금 확인 가능한 상태를 정리하세요. 외부 로그인이 필요한 단계는 사용자가 해야 할 최소 행동만 안내하고, 코드나 배포로 처리할 수 있는 작업은 직접 진행하세요. 기존 기능과 사용자 변경을 보존하고, 수정 시 lint/build 검증과 GitHub 푸시 및 Cloudflare Workers 배포 확인까지 완료하세요.
