@@ -68,5 +68,5 @@ const structuredData = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="ko"><head><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} /></head><body>{children}<AdSenseScript /></body></html>;
+  return <html lang="ko"><head><meta name="google-site-verification" content="Fl-RkEvSvd2SmTZj15B-FrthQyJ8TZ4lqBxcUlAUsWc" /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} /></head><body>{children}<AdSenseScript /></body></html>;
 }
